@@ -113,6 +113,7 @@ void getSerialData() {
   
       decodeHighBytes();
       
+      
     }
   }
 }
@@ -246,4 +247,12 @@ ISR(WDT_vect) // Watchdog timer interrupt
 
 }
 
+void checkIfMemAddress(){
+  if (dataRecvd[3:5] = "MA") {
+    return bool MA = true;
+  }
+  else {
+    return bool MA = false;
+  }
+}
 
