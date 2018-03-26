@@ -242,6 +242,20 @@ void bitFlip(uint16_t nearAddress)
   *nearAddress =& changed;
 }
 
+float getBorweinPi(float y0, float a0, int n_iter)
+{
+    int count = 0;
+    float y = y0;
+    float a = a0;
+    while(count<n_iter)
+    {
+        y = (1-pow(1-pow(y,4),0.25))/(1+pow(1-pow(y,4),0.25));
+        a = a*pow(1+y,4)-pow(2,(2*count+3))*y*(1+y+pow(y,2));
+        count++;
+    }
+    return 1/a;
+}
+
 ISR(WDT_vect) // Watchdog timer interrupt
 {
 
