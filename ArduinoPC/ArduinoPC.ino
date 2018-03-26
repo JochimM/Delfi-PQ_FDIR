@@ -51,7 +51,7 @@ void loop() {
 
   getSerialData();
   
-  processData();
+  processData(tempBuffer);
   
 }
 
@@ -111,7 +111,9 @@ void getSerialData() {
         // save the number of bytes that were sent
       dataSentNum = tempBuffer[1];
   
-      decodeHighBytes();
+      decodeHighBytes(tempBuffer);
+      //checkIfMemAddress();
+      
       
       
     }
@@ -120,7 +122,7 @@ void getSerialData() {
 
 //============================
 
-void processData() {
+void processData(char arr[]) {
 
     // processes the data that is in dataRecvd[]
 
@@ -129,11 +131,11 @@ void processData() {
       // for demonstration just copy dataRecvd to dataSend
     dataSendCount = dataRecvCount;
     for (byte n = 0; n < dataRecvCount; n++) {
-       dataSend[n] = dataRecvd[n];
-
+       dataSend[n] = arr[n];
+    
     }
     
-    dataToPC();
+    dataToPC(dataSend);
     wdt_reset();
     delay(100);
     allReceived = false; 
@@ -143,36 +145,39 @@ void processData() {
 
 //============================
 
-void decodeHighBytes() {
+void decodeHighBytes(byte arr[]) {
 
   //  copies to dataRecvd[] only the data bytes i.e. excluding the marker bytes and the count byte
   //  and converts any bytes of 253 etc into the intended numbers
   //  Note that bytesRecvd is the total of all the bytes including the markers
   dataRecvCount = 0;
+  byte dataRecvd[maxMessage];
+  int bytesRecvd = sizeof(arr)/sizeof(byte);
   for (byte n = 2; n < bytesRecvd - 1 ; n++) { // 2 skips the start marker and the count byte, -1 omits the end marker
-    byte x = tempBuffer[n];
+    byte x = arr[n];
     if (x == specialByte) {
        // debugToPC("FoundSpecialByte");
        n++;
-       x = x + tempBuffer[n];
+       x = x + arr[n];
     }
-    dataRecvd[dataRecvCount] = x;
+    arr[dataRecvCount] = x;
     dataRecvCount ++;
   }
+  
 }
 
 //====================
 
-void dataToPC() {
-
+void dataToPC(char arr[]) {
+    
       // expects to find data in dataSend[]
       //   uses encodeHighBytes() to copy data to tempBuffer
       //   sends data to PC from tempBuffer
-    encodeHighBytes();
-
+    encodeHighBytes(arr);
+    int dataSendCount = sizeof(arr)/sizeof(byte);
     Serial.write(startMarker);
     Serial.write(dataSendCount);
-    Serial.write(tempBuffer, dataTotalSend);
+    Serial.write(arr);
     Serial.write(endMarker);
     blinkLED(1);
     
@@ -180,18 +185,19 @@ void dataToPC() {
 
 //============================
 
-void encodeHighBytes() {
+void encodeHighBytes(byte arr[]) {
   // Copies to temBuffer[] all of the data in dataSend[]
   //  and converts any bytes of 253 or more into a pair of bytes, 253 0, 253 1 or 253 2 as appropriate
+  int messageLength = sizeof(arr)/sizeof(byte);
   dataTotalSend = 0;
-  for (byte n = 0; n < dataSendCount; n++) {
+  for (byte n = 0; n < messageLength; n++) {
     if (dataSend[n] >= specialByte) {
-      tempBuffer[dataTotalSend] = specialByte;
+      arr[dataTotalSend] = specialByte;
       dataTotalSend++;
-      tempBuffer[dataTotalSend] = dataSend[n] - specialByte;
+      arr[dataTotalSend] = arr[n] - specialByte;
     }
     else {
-      tempBuffer[dataTotalSend] = dataSend[n];
+      arr[dataTotalSend] = arr[n];
     }
     dataTotalSend++;
   }
@@ -228,31 +234,26 @@ void blinkLED(byte numBlinks) {
     }
 }
 
-void bitFlip(uint16_t nearAddress)
-{
-  int toChange = *nearAddress;
-  word changed = toChange;
-  int randI = random(0,16);
-  if (toChange[randI] == 1) {
-    changed[randI] = 0;
-  }
-  else{
-    changed[randI] = 1;
-  }
-  *nearAddress =& changed;
-}
+//void bitFlip(char nearAddress[])
+//{
+//  int toChange = *nearAddress;
+//  word changed = toChange;
+//  int randI = random(0,16);
+//  if (toChange[randI] == 1) {
+//    changed[randI] = 0;
+//  }
+//  else{
+//    changed[randI] = 1;
+//  }
+//  *nearAddress =& changed;
+//}
+//
+//ISR(WDT_vect) // Watchdog timer interrupt
+//{
+//
+//}
+//
+void checkIfMemAddress(byte arr[]){
 
-ISR(WDT_vect) // Watchdog timer interrupt
-{
-
-}
-
-void checkIfMemAddress(){
-  if (dataRecvd[3:5] = "MA") {
-    return bool MA = true;
-  }
-  else {
-    return bool MA = false;
-  }
 }
 
