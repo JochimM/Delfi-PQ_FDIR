@@ -23,9 +23,9 @@ byte dataSentNum = 0; // the transmitted value of the number of bytes in the pac
 byte dataRecvCount = 0;
 
 
-byte dataRecvd[maxMessage]; 
-byte dataSend[maxMessage];  
-byte tempBuffer[maxMessage];
+char dataRecvd[maxMessage]; 
+char dataSend[maxMessage];  
+char tempBuffer[maxMessage];
 
 byte dataSendCount = 0; // the number of 'real' bytes to be sent to the PC
 byte dataTotalSend = 0; // the number of bytes to send to PC taking account of encoded bytes
@@ -33,13 +33,15 @@ byte dataTotalSend = 0; // the number of bytes to send to PC taking account of e
 boolean inProgress = false;
 boolean startFound = false;
 boolean allReceived = false;
+char debugMsg[20] = "Arduino Reset";
+
 
 //================
 
 void setup() {
   pinMode(13, OUTPUT); // the onboard LED
   Serial.begin(9600);
-  debugToPC("Arduino Reset");
+  debugToPC(debugMsg);
   delay(50);
   blinkLED(2); // just so we know it's alive
   watchdogSetup();
@@ -109,12 +111,11 @@ void getSerialData() {
       allReceived = true;
       
         // save the number of bytes that were sent
+      Serial.println(tempBuffer[1]);
       dataSentNum = tempBuffer[1];
   
       decodeHighBytes(tempBuffer);
       //checkIfMemAddress();
-      
-      
       
     }
   }
@@ -125,16 +126,17 @@ void getSerialData() {
 void processData(char arr[]) {
 
     // processes the data that is in dataRecvd[]
-
   if (allReceived) {
   
       // for demonstration just copy dataRecvd to dataSend
-    dataSendCount = dataRecvCount;
-    for (byte n = 0; n < dataRecvCount; n++) {
-       dataSend[n] = arr[n];
+//    dataSendCount = dataRecvCount;
+//    for (int n = 0; n < dataSendCount; n++) {
+//       dataSend[n] = arr[n];
+    String dataSendStr = "Arduino working";
+    dataSendStr.toCharArray(dataSend, maxMessage);
     
-    }
     
+    //Serial.println(dataSend); 
     dataToPC(dataSend);
     wdt_reset();
     delay(100);
@@ -145,15 +147,13 @@ void processData(char arr[]) {
 
 //============================
 
-void decodeHighBytes(byte arr[]) {
+void decodeHighBytes(char arr[]) {
 
   //  copies to dataRecvd[] only the data bytes i.e. excluding the marker bytes and the count byte
   //  and converts any bytes of 253 etc into the intended numbers
   //  Note that bytesRecvd is the total of all the bytes including the markers
   dataRecvCount = 0;
-  byte dataRecvd[maxMessage];
-  int bytesRecvd = sizeof(arr)/sizeof(byte);
-  for (byte n = 2; n < bytesRecvd - 1 ; n++) { // 2 skips the start marker and the count byte, -1 omits the end marker
+  for (int n = 2; n < dataSentNum - 1 ; n++) { // 2 skips the start marker and the count byte, -1 omits the end marker
     byte x = arr[n];
     if (x == specialByte) {
        // debugToPC("FoundSpecialByte");
@@ -174,23 +174,22 @@ void dataToPC(char arr[]) {
       //   uses encodeHighBytes() to copy data to tempBuffer
       //   sends data to PC from tempBuffer
     encodeHighBytes(arr);
-    int dataSendCount = sizeof(arr)/sizeof(byte);
     Serial.write(startMarker);
-    Serial.write(dataSendCount);
+    Serial.write(dataTotalSend);
     Serial.write(arr);
     Serial.write(endMarker);
-    blinkLED(1);
+    // blinkLED(1);
     
 }
 
 //============================
 
-void encodeHighBytes(byte arr[]) {
+void encodeHighBytes(char arr[]) {
   // Copies to temBuffer[] all of the data in dataSend[]
   //  and converts any bytes of 253 or more into a pair of bytes, 253 0, 253 1 or 253 2 as appropriate
-  int messageLength = sizeof(arr)/sizeof(byte);
+  int messageLength = sizeof(arr)/sizeof(char);
   dataTotalSend = 0;
-  for (byte n = 0; n < messageLength; n++) {
+  for (int n = 0; n < messageLength; n++) {
     if (dataSend[n] >= specialByte) {
       arr[dataTotalSend] = specialByte;
       dataTotalSend++;
