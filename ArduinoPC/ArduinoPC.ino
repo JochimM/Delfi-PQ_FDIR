@@ -33,9 +33,11 @@ byte dataTotalSend = 0; // the number of bytes to send to PC taking account of e
 boolean inProgress = false;
 boolean startFound = false;
 boolean allReceived = false;
+boolean memReceived = false;
 char debugMsg[20] = "Arduino Reset";
-
-
+char memAddressCh[16]; 
+uint16_t memAddress;
+String dataSendStr;
 //================
 
 void setup() {
@@ -116,7 +118,7 @@ void getSerialData() {
   
       decodeHighBytes(tempBuffer);
       //checkIfMemAddress();
-      
+      checkIfMemAddress(tempBuffer);
     }
   }
 }
@@ -127,12 +129,17 @@ void processData(char arr[]) {
 
     // processes the data that is in dataRecvd[]
   if (allReceived) {
-  
+    
       // for demonstration just copy dataRecvd to dataSend
 //    dataSendCount = dataRecvCount;
 //    for (int n = 0; n < dataSendCount; n++) {
 //       dataSend[n] = arr[n];
-    String dataSendStr = "Arduino working";
+    if (memReceived) {
+      dataSendStr = "Mem Rcvd";
+    }
+    else {
+      dataSendStr = "Arduino working";
+    }
     dataSendStr.toCharArray(dataSend, maxMessage);
     
     
@@ -247,7 +254,7 @@ float getBorweinPi(float y0, float a0, int n_iter)
     return 1/a;
 }
 
-//void bitFlip(char nearAddress[])
+//void bitFlip(word nearAddress)
 //{
 //  int toChange = *nearAddress;
 //  word changed = toChange;
@@ -266,7 +273,15 @@ float getBorweinPi(float y0, float a0, int n_iter)
 //
 //}
 //
-void checkIfMemAddress(byte arr[]){
-
+void checkIfMemAddress(char arr[]){
+  byte arrLength = sizeof(arr)/sizeof(char);
+  
+  if ((arr[0] == 77) && (arr[1] == 65)){
+    for (byte n = 2; n < arrLength; n ++) {
+      memAddressCh[n] = arr[n];
+      }
+    memReceived = true;
+    } 
+  memAddress = strtol(memAddress, NULL, 16);
 }
 
