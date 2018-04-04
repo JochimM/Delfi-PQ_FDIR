@@ -13,6 +13,8 @@
 #define endMarker 255
 #define specialByte 253
 #define maxMessage 16
+#define BIT(n,i) (n>>i&1)
+
 
 // the program could be rewritten to use local variables instead of some of these globals
 //  however globals make the code simpler
@@ -36,8 +38,9 @@ boolean allReceived = false;
 boolean memReceived = false;
 char debugMsg[20] = "Arduino Reset";
 char memAddressCh[16]; 
-uint16_t memAddress;
+long int memAddress;
 String dataSendStr;
+int changedArr[16];
 //================
 
 void setup() {
@@ -142,7 +145,7 @@ void processData(char arr[]) {
     }
     dataSendStr.toCharArray(dataSend, maxMessage);
     
-    
+    //dataSend = &memReceived;
     //Serial.println(dataSend); 
     dataToPC(dataSend);
     wdt_reset();
@@ -254,19 +257,22 @@ float getBorweinPi(float y0, float a0, int n_iter)
     return 1/a;
 }
 
-//void bitFlip(word nearAddress)
-//{
-//  int toChange = *nearAddress;
-//  word changed = toChange;
-//  int randI = random(0,16);
-//  if (toChange[randI] == 1) {
-//    changed[randI] = 0;
-//  }
-//  else{
-//    changed[randI] = 1;
-//  }
-//  *nearAddress =& changed;
-//}
+void bitFlip(word *nearAddress)
+{
+  word toChange = *nearAddress;
+
+  int randI = random(0,16);
+  
+  for (int i = 0; i < 16; i ++) {
+    changedArr[i] = BIT(toChange, i);
+    }
+  if (changedArr[randI] == 1){
+  changedArr[randI] = 0;}
+  if (changedArr[randI] == 0){
+  changedArr[randI] = 1;}
+  
+  
+}
 //
 //ISR(WDT_vect) // Watchdog timer interrupt
 //{
@@ -282,6 +288,16 @@ void checkIfMemAddress(char arr[]){
       }
     memReceived = true;
     } 
-  memAddress = strtol(memAddress, NULL, 16);
+  memAddress = strtol(memAddressCh, NULL, 16);
 }
+
+//void bin2dec(int arr[]){
+//  int arraySize = sizeof(arr)/sizeof(int);
+//  word dec = 0;
+//  for (i = 0; i<arraySize; i ++) {
+//    
+//    }
+//    
+//}
+
 
