@@ -41,6 +41,9 @@ char memAddressCh[16];
 long int memAddress;
 String dataSendStr;
 int changedArr[16];
+float y0 = sqrt(2) - 1;
+float a0 = pow(2*(y0), 2);
+int n_iter = 10; 
 //================
 
 void setup() {
@@ -59,6 +62,14 @@ void loop() {
   getSerialData();
   
   processData(tempBuffer);
+
+  delay(1000);
+  float pi;
+  pi = getBorweinPi(y0, a0, int n_iter);
+  char result[40]; // Buffer big enough for 7-character float
+  dtostrf(pi, 1, 6, result); //float goes up to 8 bytes in total (the comma is also a byte) 
+  Serial.println(result);
+  delay(1000);
   
 }
 
