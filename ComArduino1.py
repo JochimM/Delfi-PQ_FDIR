@@ -74,6 +74,7 @@
 #=====================================
 
 import random
+import math
 
 def sendToArduino(sendStr):
   global startMarker, endMarker
@@ -227,7 +228,35 @@ def randAddress():
     loc3 = random.choice(foo)
 
     return "0x0"+loc1+loc2+loc3  #error location
-   
+    
+#======================================
+
+def errorcheck():       #Checks for errors in the received data
+
+# Needs to check for errors in the calculations that are made by the Arduino, this means the calc for pi,names
+# and other stuff
+    pie = math.pi
+    pie = "{0:.20f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
+    
+    name1 = 'Alexander'
+    name2 = 'Jochim'
+    name3 = 'Frederic'
+    name4 = 'Bas'  
+    
+    varlist = [pie,name1,name2,name3,name4]
+    
+    error = True
+    
+    for i in range(0,len(varlist)):
+        if varlist[i] in dataRecvd:
+            print 'Data is correct'
+            error = False
+            break
+        
+    if error != False:
+        print 'Error'
+        
+    return error  
 
 #======================================
 
