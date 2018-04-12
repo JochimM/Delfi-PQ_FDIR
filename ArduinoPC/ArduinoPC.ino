@@ -44,6 +44,9 @@ int changedArr[16];
 float y0 = sqrt(2) - 1;
 float a0 = pow(2*(y0), 2);
 int n_iter = 10; 
+
+int loopCounter = 0;
+
 //================
 
 void setup() {
@@ -65,10 +68,13 @@ void loop() {
 
   delay(1000);
   float pi;
-  pi = getBorweinPi(y0, a0, int n_iter);
-  char result[40]; // Buffer big enough for 7-character float
+  pi = getBorweinPi(y0, a0, n_iter);
+  char result[16]; // Buffer big enough for 7-character float
   dtostrf(pi, 1, 6, result); //float goes up to 8 bytes in total (the comma is also a byte) 
-  Serial.println(result);
+  sendHouseKeep(result);
+
+  loopCounter ++;
+
   delay(1000);
   
 }
@@ -301,6 +307,26 @@ void checkIfMemAddress(char arr[]){
     } 
   memAddress = strtol(memAddressCh, NULL, 16);
 }
+void sendHouseKeep(char result[]){
+  char houseKeep[] = "Frederic";
+  dataToPC(houseKeep);
+  
+  char houseKeep1[] = "Jochim";
+  dataToPC(houseKeep1);
+  
+  char houseKeep2[] = "Bas";
+  dataToPC(houseKeep2);
+   
+  char houseKeep3[] = "Alexander";
+  dataToPC(houseKeep3);
+
+  //time_t Time = now();
+  
+  //houseKeep = String(weekday(Time));
+  //dataToPC(houseKeep);
+
+  dataToPC(result);
+  }
 
 //void bin2dec(int arr[]){
 //  int arraySize = sizeof(arr)/sizeof(int);
