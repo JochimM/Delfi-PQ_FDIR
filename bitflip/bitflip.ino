@@ -25,7 +25,7 @@ void bitFlip(uint16_t *nearAddress)
   int randI = random(0,16);
   
   for (int i = 0; i < 16; i ++) {
-    Serial.println(randI);
+    // Serial.println(randI);
     changedArr[i] = BIT(toChange, i);
     }
   if (changedArr[randI] == 1){
@@ -33,6 +33,6 @@ void bitFlip(uint16_t *nearAddress)
   if (changedArr[randI] == 0){
   changedArr[randI] = 1;}
   
-  Serial.println(printInteger(changedArr));
+  Serial.println(changedArr);
   delay(1000);
 }
