@@ -279,17 +279,28 @@ void bitFlip(word *nearAddress)
   word toChange = *nearAddress;
 
   int randI = random(0,16);
-  
-  for (int i = 0; i < 16; i ++) {
-    changedArr[i] = BIT(toChange, i);
-    }
-  if (changedArr[randI] == 1){
-  changedArr[randI] = 0;}
-  if (changedArr[randI] == 0){
-  changedArr[randI] = 1;}
-  
-  
-}
+
+  word Changed = toChange ^ ((1<<randI));
+
+//  Serial.println(Changed);
+//  Serial.println(Changed,BIN);
+}  
+
+//void bitFlip(word *nearAddress)
+//{
+//  word toChange = *nearAddress;
+//
+//  int randI = random(0,16);
+//  
+//  for (int i = 0; i < 16; i ++) {
+//    changedArr[i] = BIT(toChange, i);
+//    }
+//  if (changedArr[randI] == 1){
+//  changedArr[randI] = 0;}
+//  if (changedArr[randI] == 0){
+//  changedArr[randI] = 1;}
+//}
+
 //
 //ISR(WDT_vect) // Watchdog timer interrupt
 //{
