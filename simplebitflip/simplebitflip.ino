@@ -20,13 +20,13 @@ void loop() {
   bitFlip(location);
 }
 
-void bitFlip(uint16_t *nearAddress)
+void bitFlip(word *nearAddress)
 {
-  uint16_t toChange = *nearAddress;
+  word toChange = *nearAddress;
 
   int randI = random(0,16);
 
-  uint16_t Changed = toChange ^ ((1<<randI));
+  word Changed = toChange ^ ((1<<randI));
 
   Serial.println(Changed);
   Serial.println(Changed,BIN);
