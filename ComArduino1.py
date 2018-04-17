@@ -221,13 +221,10 @@ def waitForArduino():
 #======================================      
 
 def randAddress():
-    foo = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+    
+    location = random.randint(256,2303)
 
-    loc1 = random.choice(foo)
-    loc2 = random.choice(foo)
-    loc3 = random.choice(foo)
-
-    return "0x0"+loc1+loc2+loc3  #error location
+    return location  #error location
     
 #======================================
 
@@ -257,6 +254,13 @@ def errorcheck():       #Checks for errors in the received data
         print 'Error'
         
     return error  
+    
+#======================================
+
+def analyse():     #Analyse error locations
+       
+    if error = True:
+        error_location.append(loc)
 
 #======================================
 
@@ -288,6 +292,8 @@ testData.append("zxcv1234")
 testData.append("a" + chr(16) + chr(32) + chr(0)  + chr(203))
 testData.append("b" + chr(16) + chr(32) + chr(253) + chr(255) + chr(254) + chr(253) + chr(0))
 testData.append("fghijk")
+
+error_location = []
 
 numLoops = 1000
 n = 0
