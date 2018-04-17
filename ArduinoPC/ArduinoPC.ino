@@ -38,11 +38,11 @@ boolean allReceived = false;
 boolean memReceived = false;
 char debugMsg[20] = "Arduino Reset";
 char memAddressCh[16]; 
-long int memAddress;
+uint16_t memAddress;
 String dataSendStr;
 int changedArr[16];
 float y0 = sqrt(2) - 1;
-float a0 = 2*pow(y0,2);
+float a0 = 2*pow((y0), 2);
 int n_iter = 10; 
 
 int loopCounter = 0;
@@ -70,7 +70,7 @@ void loop() {
   float pi;
   pi = getBorweinPi(y0, a0, n_iter);
   char result[16]; // Buffer big enough for 7-character float
-  dtostrf(pi, 1, 14, result); //float goes up to 8 bytes in total (the comma is also a byte) 
+  dtostrf(pi, 1, 6, result); //float goes up to 8 bytes in total (the comma is also a byte) 
   sendHouseKeep(result);
 
   loopCounter ++;
@@ -274,11 +274,11 @@ float getBorweinPi(float y0, float a0, int n_iter)
     return 1/a;
 }
 
-void bitFlip(word nearAddress)
+void bitFlip(uint16_t *nearAddress)
 {
-  int *temp;
+  uint16_t *temp;
   temp = nearAddress;
-  word toChange = *temp;
+  uint16_t toChange = *temp;
 
   int randI = random(0,16);
 
@@ -318,7 +318,7 @@ void checkIfMemAddress(char arr[]){
       }
     memReceived = true;
     } 
-  memAddress = strtol(memAddressCh, NULL, 16);
+  memAddress = strtol(memAddressCh, NULL, 10);
 }
 void sendHouseKeep(char result[]){
   char houseKeep[] = "Frederic";
