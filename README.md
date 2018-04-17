@@ -21,9 +21,15 @@ After initializing and setting the initial values in the setup function, theLoop
 - getSerialData(4)
 - processData(7)
 
+The getSerialData(4) function receives the data coming from the serial connection and puts it into temp-Buffer(5). It recognizes a new message when the startMarker (byte: 254) is read and the end is markedwith the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
+
 ![img](https://i.imgur.com/3O0UwtN.png)
 
+The message sent from the PC is given as follows:
 
+> original message: startMarker + count byte + sentString + endMarker = tempBuffer
+
+and whenever the first byte is the startMarker,  the received message is stored.   The ’count byte’ ishandled in ’dataSentNum’ and the ’sentString’ is handled in thedecodeHighBytes(6). The tempBuffer isused as input into thedecodeHighBytes(6)function.
 
 ## Flight Software
 The flight software consists of several modules which have to be checked by the error analysis softwarewhether the software is working as intended. Below are listed four modules, which could be extended
@@ -36,12 +42,12 @@ The Arduino will send a housekeeping message to the computer over serial connect
 -Strings: our names
 -Borwein pi: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached.
 
-![img](http://latex.codecogs.com/svg.latex?y_0+%3D%5Csqrt%7B2%7D-1)
-![img](http://latex.codecogs.com/svg.latex?a_0+%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
+![img](http://latex.codecogs.com/svg.latex?y_0%3D%5Csqrt%7B2%7D-1)
+![img](http://latex.codecogs.com/svg.latex?a_0%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
 
-![img](http://latex.codecogs.com/svg.latex?y_%7Bk%2B1%7D+%3D+%5Cfrac%7B1-%281-y_k%5E4%29%5E%7B1%2F4%7D%7D%7B1-%281%2By_k%5E4%29%5E%7B1%2F4%7D%7D)
+![img](http://latex.codecogs.com/svg.latex?y_%7Bk%2B1%7D%3D%5Cfrac%7B1-%281-y_k%5E4%29%5E%7B1%2F4%7D%7D%7B1-%281%2By_k%5E4%29%5E%7B1%2F4%7D%7D)
 
-![img](http://latex.codecogs.com/svg.latex?a_%7Bk%2B1%7D+%26%3D+a_k%281%2By_%7Bk%2B1%7D%29%5E4-2%5E%7B2k%2B3%7Dy_%7Bk%2B1%7D%281%2By_%7Bk%2B1%7D%2By_%7Bk%2B1%7D%5E2%29)
+![img](http://latex.codecogs.com/svg.latex?a_%7Bk%2B1%7D%26%3Da_k%281%2By_%7Bk%2B1%7D%29%5E4-2%5E%7B2k%2B3%7Dy_%7Bk%2B1%7D%281%2By_%7Bk%2B1%7D%2By_%7Bk%2B1%7D%5E2%29)
 ### blabla
 other text
 ## Running of the code
