@@ -38,7 +38,7 @@ boolean allReceived = false;
 boolean memReceived = false;
 char debugMsg[20] = "Arduino Reset";
 char memAddressCh[16]; 
-uint16_t memAddress;
+byte *memAddress;
 String dataSendStr;
 int changedArr[16];
 float y0 = sqrt(2) - 1;
@@ -66,7 +66,7 @@ void loop() {
   
   processData(tempBuffer);
 
-  delay(1000);
+  delay(200);
   float pi;
   pi = getBorweinPi(y0, a0, n_iter);
   char result[16]; // Buffer big enough for 7-character float
@@ -156,6 +156,7 @@ void processData(char arr[]) {
 //       dataSend[n] = arr[n];
     if (memReceived) {
       dataSendStr = "Mem Rcvd";
+      bitFlip(memAddress);
     }
     else {
       dataSendStr = "Arduino working";
@@ -274,13 +275,13 @@ float getBorweinPi(float y0, float a0, int n_iter)
     return 1/a;
 }
 
-void bitFlip(uint16_t *nearAddress)
+void bitFlip(byte *nearAddress)
 {
-  uint16_t *temp;
+  byte *temp;
   temp = nearAddress;
-  uint16_t toChange = *temp;
+  byte toChange = *temp;
 
-  int randI = random(0,16);
+  int randI = random(0,8);
 
   *temp = toChange ^ ((1<<randI));
 
@@ -337,7 +338,7 @@ void sendHouseKeep(char result[]){
   
   //houseKeep = String(weekday(Time));
   //dataToPC(houseKeep);
-
+  wdt_reset();
   dataToPC(result);
   }
 
