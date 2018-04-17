@@ -274,13 +274,15 @@ float getBorweinPi(float y0, float a0, int n_iter)
     return 1/a;
 }
 
-void bitFlip(word *nearAddress)
+void bitFlip(word nearAddress)
 {
-  word toChange = *nearAddress;
+  int *temp;
+  temp = nearAddress;
+  word toChange = *temp;
 
   int randI = random(0,16);
 
-  word Changed = toChange ^ ((1<<randI));
+  *temp = toChange ^ ((1<<randI));
 
 //  Serial.println(Changed);
 //  Serial.println(Changed,BIN);
