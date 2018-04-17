@@ -222,7 +222,7 @@ def waitForArduino():
 
 def randAddress():
     
-    location = random.randint(256,2303)
+    location = random.randint(256,356)
 
     return location  #error location
     
@@ -233,24 +233,24 @@ def errorcheck():       #Checks for errors in the received data
 # Needs to check for errors in the calculations that are made by the Arduino, this means the calc for pi,names
 # and other stuff
     pie = math.pi
-    pie = "{0:.20f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
+    pie = "{0:.6f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
     
-    name1 = 'Alexander'
-    name2 = 'Jochim'
-    name3 = 'Frederic'
-    name4 = 'Bas'  
+    name1 = "\xfe\x02Alexander\xff"
+    name2 = '\xfe\x02Jochim\xff'
+    name3 = '\xfe\x02Frederic\xff'
+    name4 = '\xfe\x02Bas\xff'  
+    name5 = '\xfe\x02Mem Rcvd\xff'
+
     
-    varlist = [pie,name1,name2,name3,name4]
+    varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5]
     
     error = True
     
-    for i in range(0,len(varlist)):
-        if varlist[i] in dataRecvd:
-            print 'Data is correct'
-            error = False
-            break
+    if (dataRecvd[1]) in varlist:
+        error = False
         
-    if error != False:
+    if error:
+        print (dataRecvd)
         print 'Error'
         
     return error  
@@ -259,7 +259,7 @@ def errorcheck():       #Checks for errors in the received data
 
 def analyse():     #Analyse error locations
        
-    if error = True:
+    if error == True:
         error_location.append(loc)
 
 #======================================
@@ -274,7 +274,7 @@ import numpy as np
 
 # NOTE the user must ensure that the next line refers to the correct comm port
 
-ser = serial.Serial(4, 9600)
+ser = serial.Serial("/dev/ttyACM1", 9600)
 
 
 startMarker = 254
@@ -286,25 +286,20 @@ waitForArduino()
 
 print "Arduino is ready"
 
-testData = []
-testData.append("abcde")
-testData.append("zxcv1234")
-testData.append("a" + chr(16) + chr(32) + chr(0)  + chr(203))
-testData.append("b" + chr(16) + chr(32) + chr(253) + chr(255) + chr(254) + chr(253) + chr(0))
-testData.append("fghijk")
 
 error_location = []
 
 numLoops = 1000
 n = 0
 waitingForReply = False
-
+nBitFlips = 0
 while n < numLoops:
     
-    if np.random.rand() > 0.95:
+    if np.random.rand() > 0.01:
         print "LOOP " + str(n)
         loc = randAddress()
         teststr = "MA"+str(loc)
+        nBitFlips += 1
       
         if ser.inWaiting() == 0 and waitingForReply == False:
             sendToArduino(teststr)
@@ -337,9 +332,9 @@ while n < numLoops:
         print "==========="
         print
     
-        time.sleep(0.3)
+        time.sleep(0.1)
     else:
-        time.sleep(0.3)
+        time.sleep(0.1)
         n += 1
         
 ser.close()
