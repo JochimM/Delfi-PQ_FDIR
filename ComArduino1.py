@@ -303,9 +303,8 @@ while n < numLoops:
     
     if np.random.rand() > 0.95:
         print "LOOP " + str(n)
-        teststr = ""
-        for k in range(0,8):
-            teststr += chr(np.random.randint(0,256))
+        loc = randAddress()
+        teststr = "MA"+str(loc)
       
         if ser.inWaiting() == 0 and waitingForReply == False:
             sendToArduino(teststr)
@@ -315,8 +314,6 @@ while n < numLoops:
             print "TEST STR " + teststr
             print "==========================="
             waitingForReply = True
-            
-        loc = randAddress()
     
         if ser.inWaiting > 0:
             dataRecvd = recvFromArduino()
@@ -329,6 +326,12 @@ while n < numLoops:
             print "Reply Received"
             n += 1
             waitingForReply = False
+            
+        error = errorcheck()
+        
+        analyse()
+        
+        print error
     
         print
         print "==========="
