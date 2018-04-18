@@ -154,8 +154,8 @@ def decodeHighBytes(inStr):
      outStr = outStr + x
      n += 1
      
-  print "decINSTR  " + bytesToString(inStr)
-  print "decOUTSTR " + bytesToString(outStr)
+  #print "decINSTR  " + bytesToString(inStr)
+  #print "decOUTSTR " + bytesToString(outStr)
 
   return(outStr)
 
@@ -222,11 +222,12 @@ def waitForArduino():
 
 def randAddress():
     
-    location = random.randint(256,356)
+    location = random.randint(256,2303)
 
     return location  #error location
     
 #======================================
+
 
 def errorcheck():       #Checks for errors in the received data
 
@@ -240,20 +241,24 @@ def errorcheck():       #Checks for errors in the received data
     name3 = '\xfe\x02Frederic\xff'
     name4 = '\xfe\x02Bas\xff'  
     name5 = '\xfe\x02Mem Rcvd\xff'
+    name6 = '\xfe\x02Arduino working\xff'
 
     
-    varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5]
+    
+    varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5, name6]
     
     error = True
     
     if (dataRecvd[1]) in varlist:
         error = False
+    if (dataRecvd[1]) == '\xfe\x02Arduino Reset\xff':
+        reboots += 1
         
     if error:
         print (dataRecvd)
         print 'Error'
         
-    return error  
+    return error 
     
 #======================================
 
@@ -274,7 +279,7 @@ import numpy as np
 
 # NOTE the user must ensure that the next line refers to the correct comm port
 
-ser = serial.Serial("/dev/ttyACM1", 9600)
+ser = serial.Serial("/dev/ttyACM0", 9600)
 
 
 startMarker = 254
@@ -282,12 +287,14 @@ endMarker = 255
 specialByte = 253
 
 
+
 waitForArduino()
 
 print "Arduino is ready"
 
-
+reboots = 0
 error_location = []
+error = False
 
 numLoops = 1000
 n = 0
@@ -300,15 +307,15 @@ while n < numLoops:
         loc = randAddress()
         teststr = "MA"+str(loc)
         nBitFlips += 1
-      
         if ser.inWaiting() == 0 and waitingForReply == False:
             sendToArduino(teststr)
-            print "=====sent from PC=========="
-            print "LOOP NUM " + str(n)
-            print "BYTES SENT -> " + bytesToString(teststr)
-            print "TEST STR " + teststr
-            print "==========================="
+            #print "=====sent from PC=========="
+            #print "LOOP NUM " + str(n)
+            #print "BYTES SENT -> " + bytesToString(teststr)
+            #print "TEST STR " + teststr
+            #print "==========================="
             waitingForReply = True
+           
     
         if ser.inWaiting > 0:
             dataRecvd = recvFromArduino()
@@ -317,24 +324,25 @@ while n < numLoops:
             displayDebug(dataRecvd[1])
     
         if dataRecvd[0] > 0:
-            displayData(dataRecvd[1])
-            print "Reply Received"
+            #displayData(dataRecvd[1])
+            #print "Reply Received"
             n += 1
             waitingForReply = False
-            
-        error = errorcheck()
+        if n > 0: 
+            error = errorcheck()
+
         
         analyse()
         
         print error
     
         print
-        print "==========="
+        print #"==========="
         print
     
-        time.sleep(0.1)
+        time.sleep(0.05)
     else:
-        time.sleep(0.1)
+        time.sleep(0.05)
         n += 1
         
 ser.close()
