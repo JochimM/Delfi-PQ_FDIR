@@ -9,19 +9,18 @@ An SEU, single event upset, is a change in state, caused by one single ionizing 
 High energy ionizing particles are part of the natural background in space, called galactic cosmic rays(GCR). Also solar particle events and high energy protons in the magnetosphere of the Earth, the VanAllen radiation belts (trapped particles), cause SEUs. The high energies associated with these particlesmake the spacecraft’s shielding useless in terms of preventing SEUs.
 
 ## Structure of software and hardware interface
+For the purpose of testing the FDIR testing software, an Arduino Uno board serves as hardware, representing the OBC of a CubeSat. Furthermore, a serial connection provides the communication with the pc to read out the performance of the software, with is written in Python.
 
+### Arduino Block diagram
 
+The figure below gives a top-level overview of the script used for the Arduino. The script starts by initializing the Setup<sup>(1)</sup> function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends adebug message, reading "Arduino Reset", and the LED blinks twice to indicate the Arduino board is functioning. Also the watchdog is initialized: watchdogSetup<sup>(2)</sup>, which in essense is a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino. The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
 
-### Block diagram
+After initializing and setting the initial values in the setup function, the Loop<sup>(3)</sup> function is looping continuously. It allows to change the program running on the Arduino, resulting in a different responce. This function is actively used to control the Arduino board. The script loops over two main functions:
 
-The figure below gives a top-level overview of the script used for the Arduino.  The script starts by initializing the Setup(1) function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends adebug message, reading "Arduino Reset", and the LED blinks twice to indicate the Arduino board is functioning.  Also the watchdog is initialized: watchdogSetup(2), which in essense is a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino.  The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
+- getSerialData<sup>(4)</sup>
+- processData<sup>(7)</sup>
 
-After initializing and setting the initial values in the setup function, theLoop(3)function is looping contin-uously.  It allows to change the program running on the Arduino, resulting in a different responce.  Thisfunction is actively used to control the Arduino board.The script loops over two main functions:
-
-- getSerialData(4)
-- processData(7)
-
-The getSerialData(4) function receives the data coming from the serial connection and puts it into temp-Buffer(5). It recognizes a new message when the startMarker (byte: 254) is read and the end is markedwith the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
+The getSerialData(4) function receives the data coming from the serial connection and puts it into temp-Buffer<sup>(5)</sup>. It recognizes a new message when the startMarker (byte: 254) is read and the end is markedwith the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
 
 ![img](https://i.imgur.com/3O0UwtN.png)
 
@@ -29,29 +28,65 @@ The message sent from the PC is given as follows:
 
 > original message: startMarker + count byte + sentString + endMarker = tempBuffer
 
-and whenever the first byte is the startMarker,  the received message is stored.   The ’count byte’ ishandled in ’dataSentNum’ and the ’sentString’ is handled in thedecodeHighBytes(6). The tempBuffer isused as input into thedecodeHighBytes(6)function.
+and whenever the first byte is the startMarker,  the received message is stored.   The ’count byte’ ishandled in ’dataSentNum’ and the ’sentString’ is handled in thedecodeHighBytes<sup>(6)</sup>. The tempBuffer isused as input into the decodeHighBytes<sup>(6)</sup> function. This function only works with the 'real' data, which is the message in the tempBuffer (sentString), excluding the marker bytes (first and very last byte) and the count byte (tempBuffer[1]). It converts any bytes given as a pair into the intented byte number:
+
+- 253 0 becomes 253
+- 253 1 becomes 254
+- 253 2 becomes 255
+
+If the special byte is not detected, the byte is kept the same as how it was received.  The result is thus the tempBuffer, where the special bytes within the ’real’ message are decoded into the intended bytes. Now that the data is received, it can be processed in the functionprocessData<sup>(7)</sup>, which requires thetempBuffer as input which is transferred to the variable ’dataSend’.  The message "Arduino working" is also sent to the PC as the housekeeping message. 
+
+The data then is used asinput in thedataToPc<sup>(9)</sup> function, which in principle sends the data from tempBuffer to the PC (Python) using the serial connection. However,  first another function is used before the data is sent,  as themessage  still  has  to  be  encoded,  theencodeHighBytes<sup>(10)</sup> function. The  goal  of  this  function  is  toconvert any bytes of 253 or more into a pair of bytes, 253 0, 253 1 or 253 2 as appropriate, the sameway as it was when the data was received:
+
+- 253 becomes 253 0
+- 254 becomes 253 1
+- 255 becomes 253 2
+
+The data is then sent to the PC and the data is structured the following way:
+
+> sent message: startMarker + dataTotalSend + data + endMarker
+
+where ’dataTotalSend’ is the number of bytes to send to the PC, taking into account the encoded bytesand data represents the tempBuffer encoded ’real’ data.  After sending the data, the watchdog is resetso that it again start counting from zero to check if a reset is required.
+
+### Python Block diagram
+
+HERE COMES THE PYTHON BLOCK DIAGRAM AND SOME BLABLA ON THE FUNCTIONS
+
 
 ## Flight Software
-The flight software consists of several modules which have to be checked by the error analysis softwarewhether the software is working as intended. Below are listed four modules, which could be extended
+The flight software consists of several modules which have to be checked by the error analysis software whether the software is working as intended. Below are listed four modules, which could be extended with more advanced satellite software as desired by the user.
 
 ### Watchdog timer
-In order to verify whether the flight software is functioning as desired, a watchdog kicker is implementedin the flight software. The system is typically designed so that the watchdog timer will be kicked only ifthe computer considers the system functional.  The computer determines whether the system is func-tional by conducting one or more fault detection tests and it will kick the watchdog only if all tests havepassed. Whenever the Arduino fails to reset the watchdog timer, the board will reset. Before resetting,a set of actions can be defined to take place.  One option for this would be to store some importantparameters in the EEPROM memory so they can be used again after reboot.
+In order to verify whether the flight software is functioning as desired, a watchdog kicker is implementedin the flight software. The system is typically designed so that the watchdog timer will be kicked only ifthe computer considers the system functional. The computer determines whether the system is func-tional by conducting one or more fault detection tests and it will kick the watchdog only if all tests havepassed. Whenever the Arduino fails to reset the watchdog timer, the board will reset. Before resetting, a set of actions can be defined to take place.  One option for this would be to store some important parameters in the EEPROM memory so they can be used again after reboot.
 
 ### Housekeeping Data
 The Arduino will send a housekeeping message to the computer over serial connection at set intervals. These housekeeping messages will provide information to the error analysis software about the functionality of the software.  Currently, 3 housekeeping modules are implemented, which can be extended at anytime. These are:
--Strings: our names
--Borwein pi: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached.
-
-![img](http://latex.codecogs.com/svg.latex?y_0%3D%5Csqrt%7B2%7D-1)
-![img](http://latex.codecogs.com/svg.latex?a_0%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
+- Strings: our names
+- Borwein pi: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached. 
 
 ![img](http://latex.codecogs.com/svg.latex?y_%7Bk%2B1%7D%3D%5Cfrac%7B1-%281-y_k%5E4%29%5E%7B1%2F4%7D%7D%7B1-%281%2By_k%5E4%29%5E%7B1%2F4%7D%7D)
 
 ![img](http://latex.codecogs.com/svg.latex?a_%7Bk%2B1%7D%26%3Da_k%281%2By_%7Bk%2B1%7D%29%5E4-2%5E%7B2k%2B3%7Dy_%7Bk%2B1%7D%281%2By_%7Bk%2B1%7D%2By_%7Bk%2B1%7D%5E2%29)
-### blabla
-other text
+
+  The following initial conitions have to be used:
+
+  - ![img](http://latex.codecogs.com/svg.latex?y_0%3D%5Csqrt%7B2%7D-1)
+  - ![img](http://latex.codecogs.com/svg.latex?a_0%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
+### Reboot message
+At booting, the Arduino sends out a message to the PC: "Arduino Reset".  This can be used to keeptrack of the amount of times the Arduino has rebooted.
+### Visual check
+The on-board LED will be set to blink at set intervals to enable visual inspection of the correct functioningof the software.
+
 ## Running of the code
 
-## Check of unit tests
+Some kind of user manual of how to run the code (for the noobs)
+
+## Unit tests
+
+Verification of most important functions (the bitflip function, pi function, 
 
 ## Future work and recommendations
+
+ - more advanced flight software
+ - testing on other hardware
+ - ...
