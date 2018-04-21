@@ -85,6 +85,10 @@ Some kind of user manual of how to run the code (for the noobs)
 
 Verification of most important functions (the bitflip function, pi function, 
 
+## Project complications
+
+Describe here what issues we had
+
 ## Future work and recommendations
 
  - more advanced flight software
