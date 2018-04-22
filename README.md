@@ -92,7 +92,7 @@ Write about the high level design choices that you had and the reason that you m
 
 The figure below gives a top-level overview of the script used for the Arduino. 
 
-[img]https://i.imgur.com/gNe45XR.png[/img]
+![img](https://i.imgur.com/gNe45XR.png)
 
 The script starts by initializing the Setup<sup>(1)</sup> function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends a debug message, reading "Arduino Reset", and the LED blinks ten times to indicate the Arduino board is functioning. Also the watchdog is initialized: watchdogSetup<sup>(2)</sup>, which in essense is a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino. The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
 
