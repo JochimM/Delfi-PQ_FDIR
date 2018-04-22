@@ -94,12 +94,13 @@ The figure below gives a top-level overview of the script used for the Arduino.
 
 ![img](https://i.imgur.com/gNe45XR.png)
 
-The script starts by initializing the Setup<sup>(1)</sup> function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends a debug message, reading "Arduino Reset", and the LED blinks ten times to indicate the Arduino board is functioning. Also the watchdog is initialized: watchdogSetup<sup>(2)</sup>, which in essense is a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino. The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
+The script starts by initializing the Setup<sup>(0)</sup> function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends a debug message: debugToPC<sup>(1)</sup>, reading "Arduino Reset", and the LED blinks ten times to indicate the Arduino board is functioning: blinkLED<sup>(16)</sup>. Also the watchdog is initialized: watchdogSetup<sup>(2)</sup>, which in essense is a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino. The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
 
-After initializing and setting the initial values in the setup function, the Loop<sup>(3)</sup> function is looping continuously. It allows to change the program running on the Arduino, resulting in a different responce. This function is actively used to control the Arduino board. The script loops over two main functions:
+After initializing and setting the initial values in the setup function, the Loop<sup>(3)</sup> function is looping continuously. It allows to change the program running on the Arduino, resulting in a different responce. This function is actively used to control the Arduino board. The script loops over three main functions:
 
 - getSerialData<sup>(4)</sup>
 - processData<sup>(7)</sup>
+- sendHouseKeep<sup>(14)</sup>
 
 The getSerialData(4) function receives the data coming from the serial connection and puts it into temp-Buffer<sup>(5)</sup>. It recognizes a new message when the startMarker (byte: 254) is read and the end is markedwith the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
 
@@ -107,15 +108,17 @@ The message sent from the PC is given as follows:
 
 > original message: startMarker + count byte + sentString + endMarker = tempBuffer
 
-and whenever the first byte is the startMarker,  the received message is stored.   The ’count byte’ ishandled in ’dataSentNum’ and the ’sentString’ is handled in thedecodeHighBytes<sup>(6)</sup>. The tempBuffer isused as input into the decodeHighBytes<sup>(6)</sup> function. This function only works with the 'real' data, which is the message in the tempBuffer (sentString), excluding the marker bytes (first and very last byte) and the count byte (tempBuffer[1]). It converts any bytes given as a pair into the intented byte number:
+and whenever the first byte is the startMarker,  the received message is stored.   The ’count byte’ is handled in ’dataSentNum’ and the ’sentString’ is handled in thedecodeHighBytes<sup>(6)</sup>. The tempBuffer is used as input into the decodeHighBytes<sup>(6)</sup> function. This function only works with the 'real' data, which is the message in the tempBuffer (sentString), excluding the marker bytes (first and very last byte) and the count byte (tempBuffer[1]). It converts any bytes given as a pair into the intented byte number:
 
 - 253 0 becomes 253
 - 253 1 becomes 254
 - 253 2 becomes 255
 
-If the special byte is not detected, the byte is kept the same as how it was received.  The result is thus the tempBuffer, where the special bytes within the ’real’ message are decoded into the intended bytes. Now that the data is received, it can be processed in the functionprocessData<sup>(7)</sup>, which requires thetempBuffer as input which is transferred to the variable ’dataSend’.  The message "Arduino working" is also sent to the PC as the housekeeping message. 
+If the special byte is not detected, the byte is kept the same as how it was received.  The result is thus the tempBuffer, where the special bytes within the ’real’ message are decoded into the intended bytes. Now that the data is received, it can be processed in the functionprocessData<sup>(7)</sup>, which requires the tempBuffer as input. If the full data message is received, the function checkIfMemAddress<sup>(8)</sup> is called. This function checks for the memory address is the data and saves it as 'memAddress'. The function pingFromPC<sup>(9)</sup> does reset the watchdog when a specific message is sent from the PC. 
 
-The data then is used asinput in thedataToPc<sup>(9)</sup> function, which in principle sends the data from tempBuffer to the PC (Python) using the serial connection. However,  first another function is used before the data is sent,  as themessage  still  has  to  be  encoded,  theencodeHighBytes<sup>(10)</sup> function. The  goal  of  this  function  is  toconvert any bytes of 253 or more into a pair of bytes, 253 0, 253 1 or 253 2 as appropriate, the sameway as it was when the data was received:
+If a memory address was received, the bitFlip<sup>(10)</sup> is called. This function is changing a random bit from the value corresponding to the memory address. 
+
+The data then is used as input in the dataToPc<sup>(11)</sup> function, which in principle sends the data from tempBuffer (now called 'dataSend' to the PC (Python) using the serial connection. However,  first another function is used before the data is sent,  as the message  still  has  to  be  encoded,  the encodeHighBytes<sup>(12)</sup> function. The  goal  of  this  function  is  to convert any bytes of 253 or more into a pair of bytes, 253 0, 253 1 or 253 2 as appropriate, the same way as it was when the data was received:
 
 - 253 becomes 253 0
 - 254 becomes 253 1
@@ -125,7 +128,14 @@ The data is then sent to the PC and the data is structured the following way:
 
 > sent message: startMarker + dataTotalSend + data + endMarker
 
-where ’dataTotalSend’ is the number of bytes to send to the PC, taking into account the encoded bytesand data represents the tempBuffer encoded ’real’ data.  After sending the data, the watchdog is resetso that it again start counting from zero to check if a reset is required.
+where ’dataTotalSend’ is the number of bytes to be sent to the PC, taking into account the encoded bytes and data represents the tempBuffer encoded ’real’ data.  After sending the data, the watchdog is reset: wdt_reset<sup>(13)</sup> so that it again start counting from zero to check if a reset is required.
+
+The last main function to be discussed is sendHouseKeep<sup>(14)</sup>, where again the dataToPc<sup>(11)</sup> and encodeHighBytes<sup>(12)</sup> functions are used to send two types of information:
+
+- Housekeeping data with the names: Frederic, Jochim, Bas and Alexander.
+- Housekeeping data with the pi calculation using getBorweinPi<sup>(17)</sup>.
+
+Finally, the function debugToPC<sup>(18)</sup> is used throughout the script, which sends a 0 on the location of the 'count byte' as described above. 
 
 ### Python Block diagram
 
