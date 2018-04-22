@@ -90,7 +90,11 @@ Write about the high level design choices that you had and the reason that you m
 
 ### Arduino Block diagram
 
-The figure below gives a top-level overview of the script used for the Arduino. The script starts by initializing the Setup<sup>(1)</sup> function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends adebug message, reading "Arduino Reset", and the LED blinks twice to indicate the Arduino board is functioning. Also the watchdog is initialized: watchdogSetup<sup>(2)</sup>, which in essense is a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino. The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
+The figure below gives a top-level overview of the script used for the Arduino. 
+
+![img](https://imgur.com/a/51E4Ato)
+
+The script starts by initializing the Setup<sup>(1)</sup> function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends a debug message, reading "Arduino Reset", and the LED blinks ten times to indicate the Arduino board is functioning. Also the watchdog is initialized: watchdogSetup<sup>(2)</sup>, which in essense is a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino. The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
 
 After initializing and setting the initial values in the setup function, the Loop<sup>(3)</sup> function is looping continuously. It allows to change the program running on the Arduino, resulting in a different responce. This function is actively used to control the Arduino board. The script loops over two main functions:
 
@@ -98,8 +102,6 @@ After initializing and setting the initial values in the setup function, the Loo
 - processData<sup>(7)</sup>
 
 The getSerialData(4) function receives the data coming from the serial connection and puts it into temp-Buffer<sup>(5)</sup>. It recognizes a new message when the startMarker (byte: 254) is read and the end is markedwith the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
-
-![img](https://i.imgur.com/3O0UwtN.png)
 
 The message sent from the PC is given as follows:
 
@@ -138,7 +140,7 @@ In order to verify whether the flight software is functioning as desired, a watc
 
 ### Housekeeping Data
 The Arduino will send a housekeeping message to the computer over serial connection at set intervals. These housekeeping messages will provide information to the error analysis software about the functionality of the software.  Currently, 3 housekeeping modules are implemented, which can be extended at anytime. These are:
-- Strings: our names
+- Strings: our names: Frederic, Jochim, Bas and Alexander
 - Borwein pi: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached. 
 
 ![img](http://latex.codecogs.com/svg.latex?y_%7Bk%2B1%7D%3D%5Cfrac%7B1-%281-y_k%5E4%29%5E%7B1%2F4%7D%7D%7B1-%281%2By_k%5E4%29%5E%7B1%2F4%7D%7D)
