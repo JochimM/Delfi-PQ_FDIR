@@ -139,7 +139,13 @@ Finally, the function debugToPC<sup>(18)</sup> is used throughout the script, wh
 
 ### Python Block diagram
 
-HERE COMES THE PYTHON BLOCK DIAGRAM AND SOME BLABLA ON THE FUNCTIONS
+The figure below gives a top level overview of the architecture of the Python script.
+
+Block diagram needs to be hosted here
+
+At first the serial connection (1) with the Arduino is made using the integrated serial module in Python. The Arduino is then setup using the waitforArduino function (2). This function initialises the Arduino and allows time for Arduino reset, it also ensures that any bytes left over from a previous message are discarded. Once the Arduino has been initialised and is ready for operational use, the message 'Arduino Ready' is printed. Once these functions are finished the operational phase of the python script is entered by using a loop (3) which is ran numLoops amount of time.
+
+The first action that is done in this loop is creating a random memory address (4) at which a bitflip will occur, this bitflip is performed in the Arduino script. Since the bitflip has been chosen to occur only on the RAM Memory the random address for usage with an Arduino is a random value between the byte numbers 256 and 2303. This number is then send to the Arduino using the sendToArduino function (5), which adds the start and end marker to this number and converts the random location string to the proper format (Bytes) using the encodeHighBytes function. The program now waits for a reply from the Arduino. When a reply has been send the script decodes the message by using the opposite function of the sendToArduino function, which is the recvFromArduino (6) function. To finally check whether the bitflip has caused an error in the Arduino RAM Memory the content of the received message is checked using the errorcheck (7) function. In this function the housekeeping data that is saved on the Arduino's RAM memory is checked for correctness. When an error has been found the bitflip's memory location is stored using the analyse (8) function. After numLoops have passed the serial connection is closed. 
 
 
 ## Flight Software
