@@ -175,8 +175,17 @@ The on-board LED will be set to blink at set intervals to enable visual inspecti
 Note: The time intervals are to be determined. The on-board watchdog timer on the Arduino board can be set to no more than 8000 ms, so the intervals mentioned above will have to be at least shorter than 8000 ms.
 
 ## Running of the code
+Below it can be found how the project can be build and used.
 
-Some kind of user manual of how to run the code (for the noobs): how to build/use the software and finally how to operate it. 
+1. The software should be cloned/forked on your computer. This can be done using Git, 
+2. Install the Arduino IDE (https://www.arduino.cc/en/main/software).
+3. Install Python 2.7 (https://www.python.org/download/releases/2.7/).
+4. Connect the Arduino Uno and run the file "ArduinoPC.ino". Now the script is running on the Arduino.
+5. Open the file "ComArduino.py"
+6. Select the port that the Arduino is connected with. The name of the port can be found in the Arduino IDE. For the example below, this is "COM5".
+
+![img](https://i.imgur.com/N2y2760.png)
+7. Run the Python script (F5). The script should be working now and detect errors in the RAM memory.
 
 ## Results
 
