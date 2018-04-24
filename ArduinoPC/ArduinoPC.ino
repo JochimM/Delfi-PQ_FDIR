@@ -150,9 +150,10 @@ void getSerialData() {
       char buff2[32];
       sprintf(buff2, "NumBytes = %d", dataSentNum); 
       dataToPC(buff2);
+      //sprintf(tempBuffer, "00MA0276x0");
       decodeHighBytes(tempBuffer);
       //checkIfMemAddress();
-      //sprintf(dataRecvd, "MA0276x");
+      
       
     }
   }
@@ -193,8 +194,9 @@ void decodeHighBytes(char arr[]) {
   //  and converts any bytes of 253 etc into the intended numbers
   //  Note that bytesRecvd is the total of all the bytes including the markers
   dataRecvCount = 0;
-  for (int n = 2; n < dataSentNum - 1 ; n++) { // 2 skips the start marker and the count byte, -1 omits the end marker
+  for (int n = 2; n < dataSentNum + 2 ; n++) { // 2 skips the start marker and the count byte, -1 omits the end marker
     byte x = arr[n];
+    //blinkLED(1);
     if (x == specialByte) {
        // debugToPC("FoundSpecialByte");
        n++;
@@ -301,13 +303,12 @@ void bitFlip(int nearAddress)
 
 }  
 
-
 void checkIfMemAddress(char arr[]){
   int arrLength = 4;
   //Serial.println(arrLength);
   char memAddressCh[arrLength];
   if ((arr[0] == 'M') && (arr[1] == 'A')){
-    blinkLED(1);
+    //blinkLED(1);
     byte n = 2;
     boolean notDone = true;
     while(notDone) {
@@ -326,9 +327,7 @@ void checkIfMemAddress(char arr[]){
     memReceived = true;
     memAddress = atoi(memAddressCh);
     //blinkLED(5);
-    char buff4[32];
-    sprintf(buff4, "memAdd = %d", memAddress);
-    dataToPC(buff4);
+    //dataToPC(memAddressCh);
     }
   else {
     memReceived = false;
