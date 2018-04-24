@@ -266,6 +266,9 @@ def errorcheck():       #Checks for errors in the received data
 #======================================
 
 def analyse():     #Analyse error locations
+
+    if int(loc)<1000:
+        loc = int(loc)
        
     if error == True:
         locationy = int(loc)/8
