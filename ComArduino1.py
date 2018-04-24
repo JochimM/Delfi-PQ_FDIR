@@ -223,6 +223,8 @@ def waitForArduino():
 def randAddress():
     
     location = random.randint(256,2303)
+    if location < 1000:
+        location = "0"+ str(location)
 
     return location  #error location
     
