@@ -214,7 +214,7 @@ Changing the seventh bit (randI = 6) gives (thus changing 1 into 0):
 
 > 1110101000 = 936
 
-From the above examples, it is clear that the bit flip is working is expected, since the bit flip for given bit locations is giving the expected result (eg. changing the fourth bit from 1 into 0 results in a subtraction of 2^3 = 8, thus 1000 - 8 = 992).
+From the above examples, it is clear that the bit flip is working is expected, since the bit flip for given bit locations is giving the expected result (eg. changing the fourth bit from 1 into 0 results in a subtraction of 2<sup>3</sup> = 8, thus 1000 - 8 = 992).
 
 ## Project complications
 
