@@ -224,9 +224,15 @@ The verification of the calculation of pi is done in Pi_Calculation.ino. Pi is c
 
 Pointer, memory locations
 
+Issues arose when trying to use the pointer with varying formats of the memory locations. At first it was tried to use the following format of memory location: 0x000F where the last three digits were randomnly determined. This however was proven unsuitable for use with the pointer, therefore a different approach was used, where the Arduino's RAM memory boundaries were obtained in bytes (256 to 2303) and a random number between these values is chosen in the Python script and send to the Arduino. This new approach did work.
+
 Communication over Serial
 
+The communication over serial was in times troublesome due too the way data has to be send over from Python to Arduino and vice versa. When viewing both scripts it can be seen that before data can be send a specific function is used to encode the data in the proper format, for example adding start and end markers to the string that is send over. Next to that before the data can be read its needs to be decoded again. It has taken some time to get used to the way or format that data has to be send over and can be read afterwards in each respective program.
+
 Types of variables
+
+The types of variables that were used in Arduino were difficult to use since it was not always  clear with what kind of variable was present and what kind of variable a specific function  required. This was also unclear due too the way that the communication over Serial was done, as previously described.
 
 ## Future work and recommendations
 
