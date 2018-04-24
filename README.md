@@ -175,8 +175,17 @@ The on-board LED will be set to blink at set intervals to enable visual inspecti
 Note: The time intervals are to be determined. The on-board watchdog timer on the Arduino board can be set to no more than 8000 ms, so the intervals mentioned above will have to be at least shorter than 8000 ms.
 
 ## Running of the code
+Below it can be found how the project can be build and used.
 
-Some kind of user manual of how to run the code (for the noobs): how to build/use the software and finally how to operate it. 
+1. The software should be cloned/forked on your computer. This can be done using Git, 
+2. Install the Arduino IDE (https://www.arduino.cc/en/main/software).
+3. Install Python 2.7 (https://www.python.org/download/releases/2.7/).
+4. Connect the Arduino Uno and run the file "ArduinoPC.ino". Now the script is running on the Arduino.
+5. Open the file "ComArduino.py"
+6. Select the port that the Arduino is connected with. The name of the port can be found in the Arduino IDE. For the example below, this is "COM5".
+
+![img](https://i.imgur.com/N2y2760.png)
+7. Run the Python script (F5). The script should be working now and detect errors in the RAM memory.
 
 ## Results
 
@@ -188,11 +197,18 @@ Verification of most important functions (the bitflip function, pi function,
 
 ## Project complications
 
-Document any issues that you had.
+Pointer, memory locations
+
+Communication over Serial
+
+Types of variables
 
 ## Future work and recommendations
 
- - Write about any future developments that we could do.
- - more advanced flight software
- - testing on other hardware
- - ...
+After working on this project some recommendations for future work can be made and are listed below.
+
+The program should be tested using actual flight software. At the moment the software is running through some basic calculations and creation of lists which makes up the memory that can be subjected to bitflips. Since these calculations are relatively simple the memory area that is vulnerable or subject to bitflips is limited. Running the program on actual flight software will probably increase the likelihood of a memory location, where a bitflip is inflicted, containing information. This will in turn require the FDIR software to increase its capabilities of detecting errors caused by bitflips, therefore increasing the softwares capabilities.
+
+At the moment only error detection is performed while no error correction is done. In future software the ability to correct the errors caused by bitflips should be added since this is one of the requirements of FDIR software. The ability of the FDIR to correct detected errors is crucial for mission survival.
+
+Influence other memory types besides the Arduino's RAM memory. Next to the RAM memory which is the only memory currently subject to bitflips future work should include the other memory types of the on board computer that is used.
