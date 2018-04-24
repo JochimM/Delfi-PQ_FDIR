@@ -229,6 +229,8 @@ Using the following initial conditions:
 
 > output = 3.141593 ≈ π
 
+From the above result, it is clear the right number is obtained from the Borwein algorithm. 
+
 ## Project complications
 
 Pointer, memory locations
