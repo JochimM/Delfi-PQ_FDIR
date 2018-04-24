@@ -218,14 +218,14 @@ From the above examples, it is clear that the bit flip is working is expected, s
 
 ### Pi calculation
 
-The verification of the calculation of $\pi$ is done in Pi_Calculation.ino. $\pi$ is calculated using the Borwein algorithm, which requires a small amount of iterations. For this verification, the number of iterations was set to 10.
+The verification of the calculation of π is done in Pi_Calculation.ino. $\pi$ is calculated using the Borwein algorithm, which requires a small amount of iterations. For this verification, the number of iterations was set to 10.
 
 Using the following initial conditions:
 
   - ![img](http://latex.codecogs.com/svg.latex?y_0%3D%5Csqrt%7B2%7D-1)
   - ![img](http://latex.codecogs.com/svg.latex?a_0%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
   
-\(\pi)
+π
 
 ## Project complications
 
