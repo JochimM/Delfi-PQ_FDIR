@@ -12,7 +12,7 @@ Next to this README file including all necessary documentation, there are two ma
 
 Besides, this repository consists of two verification Arduino files:
 
-- Pi_Calculation.ino: This file verifies the calculation of pi, based on the Borwein algorithm, is working.
+- Pi_Calculation.ino: This file verifies the calculation of π, based on the Borwein algorithm, is working.
 - simplebitflip.ino: This file verifies the bit flip is working. This file changes the bit for a specified value (e.g. 1000) on a specified location (e.g. bit n° 4) and gives the new value.
 - Folder with trash?
 
@@ -133,7 +133,7 @@ where ’dataTotalSend’ is the number of bytes to be sent to the PC, taking in
 The last main function to be discussed is sendHouseKeep<sup>(14)</sup>, where again the dataToPc<sup>(11)</sup> and encodeHighBytes<sup>(12)</sup> functions are used to send two types of information:
 
 - Housekeeping data with the names: Frederic, Jochim, Bas and Alexander.
-- Housekeeping data with the pi calculation using getBorweinPi<sup>(17)</sup>.
+- Housekeeping data with the π calculation using getBorweinPi<sup>(17)</sup>.
 
 Finally, the function debugToPC<sup>(18)</sup> is used throughout the script, which sends a 0 on the location of the 'count byte' as described above. 
 
@@ -157,7 +157,7 @@ In order to verify whether the flight software is functioning as desired, a watc
 ### Housekeeping Data
 The Arduino will send a housekeeping message to the computer over serial connection at set intervals. These housekeeping messages will provide information to the error analysis software about the functionality of the software.  Currently, 3 housekeeping modules are implemented, which can be extended at anytime. These are:
 - Strings: our names: Frederic, Jochim, Bas and Alexander
-- Borwein pi: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached. 
+- Borwein π: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached. 
 
 ![img](http://latex.codecogs.com/svg.latex?y_%7Bk%2B1%7D%3D%5Cfrac%7B1-%281-y_k%5E4%29%5E%7B1%2F4%7D%7D%7B1-%281%2By_k%5E4%29%5E%7B1%2F4%7D%7D)
 
@@ -218,14 +218,16 @@ From the above examples, it is clear that the bit flip is working is expected, s
 
 ### Pi calculation
 
-The verification of the calculation of π is done in Pi_Calculation.ino. $\pi$ is calculated using the Borwein algorithm, which requires a small amount of iterations. For this verification, the number of iterations was set to 10.
+The verification of the calculation of π is done in Pi_Calculation.ino. π is calculated using the Borwein algorithm, which requires a small amount of iterations. For this verification, the number of iterations was set to 10.
 
 Using the following initial conditions:
 
   - ![img](http://latex.codecogs.com/svg.latex?y_0%3D%5Csqrt%7B2%7D-1)
   - ![img](http://latex.codecogs.com/svg.latex?a_0%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
   
-π
+π is then calculated using the algorithm discussed above.
+
+> output = 3.141593 ≈ π
 
 ## Project complications
 
