@@ -141,7 +141,7 @@ Finally, the function debugToPC<sup>(18)</sup> is used throughout the script, wh
 
 The figure below gives a top level overview of the architecture of the Python script.
 
-Block diagram needs to be hosted here
+![img](https://i.imgur.com/60VrOWo.png)
 
 At first the serial connection (1) with the Arduino is made using the integrated serial module in Python. The Arduino is then setup using the waitforArduino function (2). This function initialises the Arduino and allows time for Arduino reset, it also ensures that any bytes left over from a previous message are discarded. Once the Arduino has been initialised and is ready for operational use, the message 'Arduino Ready' is printed. Once these functions are finished the operational phase of the python script is entered by using a loop (3) which is ran numLoops amount of time.
 
