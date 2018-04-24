@@ -232,30 +232,15 @@ def randAddress():
 #======================================
 
 
-def errorcheck():       #Checks for errors in the received data
+def errorcheck(varlist):       #Checks for errors in the received data
 
 # Needs to check for errors in the calculations that are made by the Arduino, this means the calc for pi,names
 # and other stuff
-    pie = math.pi
-    pie = "{0:.6f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
-    
-    name1 = "\xfe\x02Alexander\xff"
-    name2 = '\xfe\x02Jochim\xff'
-    name3 = '\xfe\x02Frederic\xff'
-    name4 = '\xfe\x02Bas\xff'  
-    name5 = '\xfe\x02Mem Rcvd\xff'
-    name6 = '\xfe\x02Arduino working\xff'
-
-    
-    
-    varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5, name6]
     
     error = True
     
     if (dataRecvd[1]) in varlist:
         error = False
-    if (dataRecvd[1]) == '\xfe\x02Arduino Reset\xff':
-        reboots += 1
         
     if error:
         print (dataRecvd)
@@ -316,6 +301,18 @@ error_false_locationy = []
 error_false_locationx = []
 error = False
 
+pie = math.pi
+pie = "{0:.6f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
+    
+name1 = "\xfe\x02Alexander\xff"
+name2 = '\xfe\x02Jochim\xff'
+name3 = '\xfe\x02Frederic\xff'
+name4 = '\xfe\x02Bas\xff'  
+name5 = '\xfe\x02Mem Rcvd\xff'
+name6 = '\xfe\x02Arduino working\xff'
+
+varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5, name6]
+
 numLoops = 1000
 n = 0
 waitingForReply = False
@@ -349,7 +346,10 @@ while n < numLoops:
             n += 1
             waitingForReply = False
         if n > 0: 
-            error = errorcheck()
+            error = errorcheck(varlist)
+            
+        if error:
+            varlist.append("\xfe\x02"+str(dataRecvd[1]+"\xff")
 
         
         analyse()
