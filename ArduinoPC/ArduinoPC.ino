@@ -62,8 +62,8 @@ void setup() {
   sprintf(buff, "V %d", &testVar); 
   debugToPC(buff);
   delay(50);
-  //blinkLED(10); // just so we know it's alive
-  //watchdogSetup();
+  blinkLED(10); // just so we know it's alive
+  watchdogSetup();
 }
 
 //================
@@ -71,14 +71,9 @@ void setup() {
 void loop() {
 
   getSerialData();
-  //char buff1[50];
-  //sprintf(buff1, "TEST %d, %d", testVar, memAddress); 
-  
-  //debugToPC(buff1);
-  
+
   processData(dataRecvd);
-  //dataToPC(dataRecvd);
-  //checkIfMemAddress(tempBuffer);
+
   delay(200);
   float pi;
   pi = getBorweinPi(y0, a0, n_iter);
@@ -88,7 +83,7 @@ void loop() {
 
   loopCounter ++;
   //bitFlip(276);
-  delay(500);
+  delay(100);
   
 }
 
@@ -97,7 +92,7 @@ void watchdogSetup(void)
 {
   cli();
 
-  //wdt_reset();
+  wdt_reset();
 /*
  * WDTCSR configuration:
  * WDIE = 1 : Interrupt Enable
@@ -132,7 +127,7 @@ void getSerialData() {
     if (x == startMarker) { 
       bytesRecvd = 0; 
       inProgress = true;
-      // blinkLED(2);
+      
       // debugToPC("start received");
     }
       
@@ -147,9 +142,9 @@ void getSerialData() {
       
       
       dataSentNum = tempBuffer[1];
-      char buff2[32];
-      sprintf(buff2, "NumBytes = %d", dataSentNum); 
-      dataToPC(buff2);
+//      char buff2[32];
+//      sprintf(buff2, "NumBytes = %d", dataSentNum); 
+//      dataToPC(buff2);
       //sprintf(tempBuffer, "00MA0276x0");
       decodeHighBytes(tempBuffer);
       //checkIfMemAddress();
@@ -168,18 +163,18 @@ void processData(char arr[]) {
     checkIfMemAddress(arr);
     //pingFromPC(arr);
     if (memReceived) {
-      //blinkLED(10);
+      
       dataSendStr = "Mem Rcvd";
       bitFlip(memAddress);
-      //blinkLED(1);
+      
     }
     else {
       dataSendStr = "Arduino working";
     }
     dataSendStr.toCharArray(dataSend, maxMessage);
     
-    dataToPC(dataSend);
-    //wdt_reset();
+    //dataToPC(dataSend);
+    wdt_reset();
     delay(100);
     allReceived = false; 
     
@@ -196,7 +191,7 @@ void decodeHighBytes(char arr[]) {
   dataRecvCount = 0;
   for (int n = 2; n < dataSentNum + 2 ; n++) { // 2 skips the start marker and the count byte, -1 omits the end marker
     byte x = arr[n];
-    //blinkLED(1);
+    
     if (x == specialByte) {
        // debugToPC("FoundSpecialByte");
        n++;
@@ -220,7 +215,7 @@ void dataToPC(char arr[]) {
     Serial.write(dataTotalSend);
     Serial.write(arr);
     Serial.write(endMarker);
-    // blinkLED(1);
+    
     
 }
 
@@ -269,9 +264,9 @@ void debugToPC( byte num) {
 void blinkLED(byte numBlinks) {
     for (byte n = 0; n < numBlinks; n ++) {
       digitalWrite(13, HIGH);
-      delay(500);
+      delay(50);
       digitalWrite(13, LOW);
-      delay(500);
+      delay(50);
     }
 }
 
@@ -298,8 +293,8 @@ void bitFlip(int nearAddress)
   int randI = random(0,8);
 
   *temp = toChange ^ ((1<<randI));
-  //blinkLED(randI);
-  //blinkLED(2);
+  
+  
 
 }  
 
@@ -308,26 +303,33 @@ void checkIfMemAddress(char arr[]){
   //Serial.println(arrLength);
   char memAddressCh[arrLength];
   if ((arr[0] == 'M') && (arr[1] == 'A')){
-    //blinkLED(1);
+    
     byte n = 2;
     boolean notDone = true;
     while(notDone) {
       if (arr[n] != 'x'){
         memAddressCh[n-2] = arr[n];
         n ++;
+        //blinkLED(1);
+        //delay(500);
       }
       else {
         notDone = false;
         }
-      //blinkLED(arr[n]);
+      
       //delay(1000);
       }
     //Serial.println(memAddressCh);
     //memAddressCh[-1] = NULL;
+    //dataToPC(memAddressCh);
     memReceived = true;
     memAddress = atoi(memAddressCh);
-    //blinkLED(5);
+    
+//    char buff2[50];
+//    sprintf(buff2, "memAddress = %d", memAddress);
+//    dataToPC(buff2);
     //dataToPC(memAddressCh);
+
     }
   else {
     memReceived = false;
@@ -336,25 +338,17 @@ void checkIfMemAddress(char arr[]){
 }
 
 void sendHouseKeep(char result[]){
-  //dataToPC(houseKeep);
-  //dataToPC(houseKeep1);
-  //dataToPC(houseKeep2);
-  //dataToPC(houseKeep3);
-  char buff[16];
-  sprintf(buff, "V %d", testVar);
-  dataToPC(buff);
-  
-  //time_t Time = now();
-  
-  //houseKeep = String(weekday(Time));
-  //dataToPC(houseKeep);
-  //wdt_reset();
-  //dataToPC(result);
+  dataToPC(houseKeep);
+  dataToPC(houseKeep1);
+  dataToPC(houseKeep2);
+  dataToPC(houseKeep3);
+  wdt_reset();
+  dataToPC(result);
   }
 
 void pingFromPC(char arr[]){
   if ((arr[0] == 107) && (arr[1] == 105) && (arr[2] == 99) && (arr[3] == 107)){
-    //blinkLED(1);
+    
     //wdt_reset();
     }
   }
