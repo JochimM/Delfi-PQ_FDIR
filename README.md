@@ -196,7 +196,9 @@ Types of variables
 
 ## Future work and recommendations
 
-Run the program on actual flight software. At the moment the software is running through some basic calculations and creation of lists which makes up the memory that can be subjected to bitflips. Since these calculations are relatively simple the memory area that is vulnerable or subject to bitflips is limited. Running the program on actual flight software will probably increase the likelihood of a memory location, where a bitflip is inflicted, containing information. This will in turn require the FDIR software to increase its capabilities of detecting errors caused by bitflips, therefore increasing the softwares capabilities.
+After working on this project some recommendations for future work can be made and are listed below.
+
+The program should be tested using actual flight software. At the moment the software is running through some basic calculations and creation of lists which makes up the memory that can be subjected to bitflips. Since these calculations are relatively simple the memory area that is vulnerable or subject to bitflips is limited. Running the program on actual flight software will probably increase the likelihood of a memory location, where a bitflip is inflicted, containing information. This will in turn require the FDIR software to increase its capabilities of detecting errors caused by bitflips, therefore increasing the softwares capabilities.
 
 At the moment only error detection is performed while no error correction is done. In future software the ability to correct the errors caused by bitflips should be added since this is one of the requirements of FDIR software. The ability of the FDIR to correct detected errors is crucial for mission survival.
 
