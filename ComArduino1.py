@@ -73,6 +73,7 @@
 
 #=====================================
 
+import matplotlib.pyplot as plt
 import random
 import math
 
@@ -267,7 +268,18 @@ def errorcheck():       #Checks for errors in the received data
 def analyse():     #Analyse error locations
        
     if error == True:
-        error_location.append(loc)
+        locationy = int(loc)/8
+        locationx = loc-(8*locationy)
+
+        error_true_locationy.append(locationy)
+        error_true_locationx.append(locationx)
+        
+    if error == False:
+        locationy = int(loc)/8
+        locationx = loc-(8*locationy)
+
+        error_false_locationy.append(locationy)
+        error_false_locationx.append(locationx)        
 
 #======================================
 
@@ -295,7 +307,10 @@ waitForArduino()
 print "Arduino is ready"
 
 reboots = 0
-error_location = []
+error_true_locationy = []
+error_true_locationx = []
+error_false_locationy = []
+error_false_locationx = []
 error = False
 
 numLoops = 1000
@@ -346,5 +361,9 @@ while n < numLoops:
     else:
         time.sleep(0.05)
         n += 1
+        
+plt.plot(error_true_locationx, error_true_locationy, 'ro')
+plt.plot(error_false_locationx, error_false_locationy, 'go')
+plt.show()
         
 ser.close()
