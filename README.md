@@ -188,11 +188,16 @@ Verification of most important functions (the bitflip function, pi function,
 
 ## Project complications
 
-Document any issues that you had.
+Pointer, memory locations
+
+Communication over Serial
+
+Types of variables
 
 ## Future work and recommendations
 
- - Write about any future developments that we could do.
- - more advanced flight software
- - testing on other hardware
- - ...
+Run the program on actual flight software. At the moment the software is running through some basic calculations and creation of lists which makes up the memory that can be subjected to bitflips. Since these calculations are relatively simple the memory area that is vulnerable or subject to bitflips is limited. Running the program on actual flight software will probably increase the likelihood of a memory location, where a bitflip is inflicted, containing information. This will in turn require the FDIR software to increase its capabilities of detecting errors caused by bitflips, therefore increasing the softwares capabilities.
+
+At the moment only error detection is performed while no error correction is done. In future software the ability to correct the errors caused by bitflips should be added since this is one of the requirements of FDIR software. The ability of the FDIR to correct detected errors is crucial for mission survival.
+
+Influence other memory types besides the Arduino's RAM memory. Next to the RAM memory which is the only memory currently subject to bitflips future work should include the other memory types of the on board computer that is used.
