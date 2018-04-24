@@ -223,10 +223,11 @@ def waitForArduino():
 
 def randAddress():
     
-    location = random.randint(256,2303)
+    location = random.randint(10,500) #2303
     if location < 1000:
         location = "0"+ str(location)
-
+        
+    print location
     return location  #error location
     
 #======================================
@@ -254,18 +255,17 @@ def errorcheck():       #Checks for errors in the received data
     
     if (dataRecvd[1]) in varlist:
         error = False
-    if (dataRecvd[1]) == '\xfe\x02Arduino Reset\xff':
-        reboots += 1
         
     if error:
         print (dataRecvd)
         print 'Error'
-        
-    return error 
     
+    return error
+    
+
 #======================================
 
-def analyse():     #Analyse error locations
+def analyse(loc):     #Analyse error locations
 
     if int(loc)<1000:
         loc = int(loc)
@@ -284,6 +284,25 @@ def analyse():     #Analyse error locations
         error_false_locationy.append(locationy)
         error_false_locationx.append(locationx)        
 
+def checkToSend(allNames):
+    name1 = "\xfe\x02Alexander\xff"
+    name2 = '\xfe\x02Jochim\xff'
+    name3 = '\xfe\x02Frederic\xff'
+    name4 = '\xfe\x02Bas\xff'  
+    pie = math.pi
+    pie = "{0:.6f}".format(pie)
+    varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4]
+    check = 0
+    for i in range(0, len(varlist)):
+        if varlist[i] in allNames:
+            check += 1
+            
+    if check == len(varlist):
+        send = True
+    else:
+        send = False
+    return send
+        
 #======================================
 
 # THE DEMO PROGRAM STARTS HERE
@@ -316,54 +335,61 @@ error_false_locationy = []
 error_false_locationx = []
 error = False
 
-numLoops = 1000
+numLoops = 10000
 n = 0
 waitingForReply = False
 nBitFlips = 0
+allNames = []
+sendMemAddr = False
+
 while n < numLoops:
     
-    if np.random.rand() > 0.01:
-        print "LOOP " + str(n)
+    
+    print "LOOP " + str(n)
+    
+    if ser.inWaiting() == 0 and waitingForReply == False and sendMemAddr:
         loc = randAddress()
-        teststr = "MA"+str(loc)
+        teststr = "MA" + str(loc)+"x"
         nBitFlips += 1
-        if ser.inWaiting() == 0 and waitingForReply == False:
-            sendToArduino(teststr)
-            #print "=====sent from PC=========="
-            #print "LOOP NUM " + str(n)
-            #print "BYTES SENT -> " + bytesToString(teststr)
-            #print "TEST STR " + teststr
-            #print "==========================="
-            waitingForReply = True
-           
-    
-        if ser.inWaiting > 0:
-            dataRecvd = recvFromArduino()
-    
-        if dataRecvd[0] == 0:
-            displayDebug(dataRecvd[1])
-    
-        if dataRecvd[0] > 0:
-            #displayData(dataRecvd[1])
-            #print "Reply Received"
-            n += 1
-            waitingForReply = False
-        if n > 0: 
-            error = errorcheck()
+        sendToArduino(teststr)
+        #print "=====sent from PC=========="
+        #print "LOOP NUM " + str(n)
+        #print "BYTES SENT -> " + bytesToString(teststr)
+        #print "TEST STR " + teststr
+        #print "==========================="
+        waitingForReply = True
+       
 
-        
-        analyse()
-        
-        print error
+    if ser.inWaiting > 0:
+        dataRecvd = recvFromArduino()
     
-        print
-        print #"==========="
-        print
+    if dataRecvd[0] == 0:
+        displayDebug(dataRecvd[1])
     
-        time.sleep(0.05)
-    else:
-        time.sleep(0.05)
+    if dataRecvd[0] > 0:
+        displayData(dataRecvd[1])
+        #print "Reply Received"
         n += 1
+        waitingForReply = False
+        allNames.append(dataRecvd[1])
+        sendMemAddr = checkToSend(allNames)
+        if sendMemAddr == True:
+            allNames = []
+            
+    if n > 0: 
+        error = errorcheck()
+        
+    
+    analyse(loc)
+    
+    print error
+
+    print
+    print #"==========="
+    print
+
+    time.sleep(0.05)
+
         
 plt.plot(error_true_locationx, error_true_locationy, 'ro')
 plt.plot(error_false_locationx, error_false_locationy, 'go')
