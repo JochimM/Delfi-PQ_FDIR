@@ -225,7 +225,7 @@ Using the following initial conditions:
   - ![img](http://latex.codecogs.com/svg.latex?y_0%3D%5Csqrt%7B2%7D-1)
   - ![img](http://latex.codecogs.com/svg.latex?a_0%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
   
-$\pi$
+\(\pi)
 
 ## Project complications
 
