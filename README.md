@@ -216,6 +216,10 @@ Changing the seventh bit (randI = 6) gives (thus changing 1 into 0):
 
 From the above examples, it is clear that the bit flip is working is expected, since the bit flip for given bit locations is giving the expected result (eg. changing the fourth bit from 1 into 0 results in a subtraction of 2<sup>3</sup> = 8, thus 1000 - 8 = 992).
 
+### Pi calculation
+
+The verification of the calculation of pi is done in Pi_Calculation.ino. Pi is calculated using the Borwein algorithm, which requires a small amount of iterations.
+
 ## Project complications
 
 Pointer, memory locations
