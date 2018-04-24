@@ -13,7 +13,7 @@ Next to this README file including all necessary documentation, there are two ma
 Besides, this repository consists of two verification Arduino files:
 
 - Pi_Calculation.ino: This file verifies the calculation of pi, based on the Borwein algorithm, is working.
-- simplebitflip.ino: This file verifies the bit flip is working. This file changes the bit for a specified value (e.g. 1000) on a specified location (e.g. bit n° 5) and gives the new value.
+- simplebitflip.ino: This file verifies the bit flip is working. This file changes the bit for a specified value (e.g. 1000) on a specified location (e.g. bit n° 4) and gives the new value.
 - Folder with trash?
 
 ## Literature study
@@ -185,6 +185,7 @@ Below it can be found how the project can be build and used.
 6. Select the port that the Arduino is connected with. The name of the port can be found in the Arduino IDE. For the example below, this is "COM5".
 
 ![img](https://i.imgur.com/N2y2760.png)
+
 7. Run the Python script (F5). The script should be working now and detect errors in the RAM memory.
 
 ## Results
@@ -193,7 +194,27 @@ The results of the bit flips in various memory locations (have a nice plot).
 
 ## Unit tests
 
-Verification of most important functions (the bitflip function, pi function, 
+### Bit flip
+
+The verification of the bit flip can be found in simplebitflip.ino. In this file, the value 1000 is used to check the bit flip is working properly. The value 1000 in binary code is 1111101000. 
+
+> (1000,BIN) = 1111101000
+
+The normal bit flip function chooses a random bit location. However, for the sake of verification, a known bit is selected to be flipped. Below some examples are given. Note that counting starts from the end of the binary number (low bits). 
+
+Changing the first bit (randI = 0) gives (thus changing 0 into 1):
+
+> 1111101001 = 1001
+
+Changing the fourth bit (randI = 3) gives (thus changing 1 into 0):
+
+> 1111100000 = 992
+
+Changing the seventh bit (randI = 6) gives (thus changing 1 into 0):
+
+> 1110101000 = 936
+
+From the above examples, it is clear that the bit flip is working is expected, since the bit flip for given bit locations is giving the expected result (eg. changing the fourth bit from 1 into 0 results in a subtraction of 2^3 = 8, thus 1000 - 8 = 992).
 
 ## Project complications
 
