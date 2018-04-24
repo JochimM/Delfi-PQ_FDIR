@@ -45,7 +45,7 @@ int n_iter = 10;
 
 int loopCounter = 0;
 
-byte testVar = '8';
+byte testVar = 1000;
 
 char houseKeep[] = "Frederic";
 char houseKeep1[] = "Jochim";
@@ -166,8 +166,9 @@ void processData(char arr[]) {
 //    dataSendCount = dataRecvCount;
 //    for (int n = 0; n < dataSendCount; n++) {
 //       dataSend[n] = arr[n];
+    arr = "MA276";
     checkIfMemAddress(arr);
-    pingFromPC(arr);
+    //pingFromPC(arr);
     if (memReceived) {
       //blinkLED(1);
       dataSendStr = "Mem Rcvd";
@@ -270,9 +271,9 @@ void debugToPC( byte num) {
 void blinkLED(byte numBlinks) {
     for (byte n = 0; n < numBlinks; n ++) {
       digitalWrite(13, HIGH);
-      delay(50);
+      delay(500);
       digitalWrite(13, LOW);
-      delay(50);
+      delay(500);
     }
 }
 
@@ -300,7 +301,7 @@ void bitFlip(int nearAddress)
 
   *temp = toChange ^ ((1<<randI));
   
-  //blinkLED(2);
+  blinkLED(2);
 
 }  
 
@@ -308,29 +309,33 @@ void bitFlip(int nearAddress)
 void checkIfMemAddress(char arr[]){
   byte arrLength = sizeof(arr)/sizeof(char);
   char memAddressCh[arrLength-1];
-  if ((arr[0] == 77) && (arr[1] == 'A')){
+  if ((arr[0] == 'M') && (arr[1] == 'A')){
     //blinkLED(1);
     for (byte n = 2; n < arrLength; n ++) {
       memAddressCh[n-2] = arr[n];
-      
+      blinkLED(arr[n]);
+      delay(1000);
       }
-    memAddressCh[-1] = 0;
+    
+    memAddressCh[-1] = NULL;
     memReceived = true;
+    memAddress = strtol(memAddressCh, NULL, 16);
+    blinkLED(5);
+    dataToPC(memAddressCh);
     }
   else {
     memReceived = false;
  
     }
-     
-  memAddress = strtol(memAddressCh, NULL, 10);
-  
 }
 void sendHouseKeep(char result[]){
   dataToPC(houseKeep);
   dataToPC(houseKeep1);
   dataToPC(houseKeep2);
   dataToPC(houseKeep3);
-
+  char buff[16];
+  sprintf(buff, "V %d", testVar);
+  dataToPC(buff);
   
   //time_t Time = now();
   
