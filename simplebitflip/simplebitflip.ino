@@ -23,13 +23,13 @@ void bitFlip(word *nearAddress)
   word toChange = *nearAddress;
 
   // Choose which bit to switch. Note the count is from right to left.
-  int randI = 6;
+  int randI = 0;
 
   word Changed = toChange ^ ((1<<randI));
 
   Serial.println(Changed);
   Serial.println(Changed,BIN);
-  delay(10000);
+  delay(4000);
 }  
 
 
