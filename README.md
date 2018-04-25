@@ -1,11 +1,11 @@
 # Delfi-PQ_FDIR
 
 ## Description and purpose of the project
-Fault Detection, Isolation and Recovery (FDIR) is a vital part of satellite systems engineering due to the harmful effects of radiation in space. Testing of the FDIR system is challenging and especially lacks experience for CubeSats. This project aims to develop open-source software for testing and analyzing FDIR systems, suitable for continuous integration. The developed software will be modular and should be easy to adapt for uses other than the test case. Furthermore, the developed tool will serve to test the FDIR systems on the Delfi-PQ, a 3U PocketCube, developed at Delft University of Technology, which will function as a platform for technology demonstration and education. 
+Fault Detection, Isolation and Recovery (FDIR) is a vital part of satellite systems engineering due to the harmful effects of radiation in space. Testing of the FDIR system is challenging and especially lacks experience for CubeSats. This project aims to develop open-source software for testing and analysing FDIR systems, suitable for continuous integration. The developed software will be modular and should be easy to adapt for uses other than the test case. Furthermore, the developed tool will serve to test the FDIR systems on the Delfi-PQ, a 3U PocketCube, developed at Delft University of Technology, which will function as a platform for technology demonstration and education. 
 
 During the process of this project, some design choices were made and are listed below:
 
-- The protocol was kept as simple as possible, as this was the first experience with data error analysis using a microcontroller. Therefore, it was decided to send the data with a fixed structure. The data consists of a startmarker (character 254) indicating the beginning of the message followed by the number of bytes in the message (count byte), and an endmarker (character 255) indicating the end of the message. Furthermore the special byte (character 253) was used in case the begin or end marker was used in the real message of the data sent.
+- The protocol was kept as simple as possible, as this was the first experience with data error analysis using a microcontroller. Therefore, it was decided to send the data with a fixed structure. The data consists of a startmarker (character 254) indicating the beginning of the message followed by the number of bytes in the message (count byte), and an endmarker (character 255) at the very end indicating the end of the message. Furthermore the special byte (character 253) was used in case the begin or end marker was used in the real message of the data sent.
 
 - Again for the sake of simplicity, it was decided to only work with characters as the type of the data.
 
