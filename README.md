@@ -14,13 +14,13 @@ Besides, this repository consists of two verification Arduino files:
 
 - Pi_Calculation.ino: This file verifies the calculation of π, based on the Borwein algorithm, is working.
 - simplebitflip.ino: This file verifies the bit flip is working. This file changes the bit for a specified value (e.g. 1000) on a specified location (e.g. bit n° 4) and gives the new value.
-- Folder with trash?
+- <span style="color:blue">*Folder with trash?*</span>
 
 ## Literature study
 
 
 ### How are SEU’s caused?
-An SEU, single event upset, is a change in state, caused by one single ionizing particle that strikes asensitive node in a device like a microprocessor, semiconductor or power transistor (micro-electronicdevice). The free charge, created by ionization in an important node of a logic element (such as amemory bit) results in the state change. The error in the output of the device or its operation because of the strike is called a SEU or a soft error.
+An SEU, single event upset, is a change in state, caused by one single ionizing particle that strikes asensitive node in a device like a microprocessor, semiconductor or power transistor (micro-electronic device). The free charge, created by ionization in an important node of a logic element (such as a memory bit) results in the state change. The error in the output of the device or its operation because of the strike is called a SEU or a soft error.
 
 High energy ionizing particles are part of the natural background in space, called galactic cosmic rays(GCR). Also solar particle events and high energy protons in the magnetosphere of the Earth, the VanAllen radiation belts (trapped particles), cause SEUs. The high energies associated with these particlesmake the spacecraft’s shielding useless in terms of preventing SEUs.
 
@@ -94,7 +94,7 @@ The figure below gives a top-level overview of the script used for the Arduino.
 
 ![img](https://i.imgur.com/gNe45XR.png)
 
-The script starts by initializing the Setup<sup>(0)</sup> function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends a debug message: debugToPC<sup>(1)</sup>, reading "Arduino Reset", and the LED blinks ten times to indicate the Arduino board is functioning: blinkLED<sup>(16)</sup>. Also the watchdog is initialized: watchdogSetup<sup>(2)</sup>, which in essense is a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino. The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
+The script starts by initializing the Setup<sup>(0)</sup> function, indicating the start of the sketch. It is used to initialize the variables, the onboard LED pin mode and the serial connection with the Python script running on the PC. It also sends a debug message: debugToPC<sup>(1)</sup>, reading "Arduino Reset", and the LED blinks ten times to indicate the Arduino board is functioning: blinkLED<sup>(16)</sup>. Also the watchdog is initialized: watchdogSetup<sup>(2)</sup>, which is in essense a timer.  It forces a restart when a "system ok" signal is not received coming from the Arduino. The watchdog will reset when no message is received. It results in the same effect as pressing the reset button on the Arduino board.
 
 After initializing and setting the initial values in the setup function, the Loop<sup>(3)</sup> function is looping continuously. It allows to change the program running on the Arduino, resulting in a different responce. This function is actively used to control the Arduino board. The script loops over three main functions:
 
@@ -235,7 +235,7 @@ From the above result, it is clear the right number is obtained from the Borwein
 
 - Pointer, memory locations
 
-Issues arose when trying to use the pointer with varying formats of the memory locations. At first it was tried to use the following format of memory location: 0x000F where the last three digits were randomnly determined. This however was proven unsuitable for use with the pointer, therefore a different approach was used, where the Arduino's RAM memory boundaries were obtained in bytes (256 to 2303) and a random number between these values is chosen in the Python script and send to the Arduino. This new approach did work.
+Issues arose when trying to use the pointer with varying formats of the memory locations. At first it was tried to use the following format of memory location: 0x000F where the last three digits were determined at random. This however was proven unsuitable for use with the pointer, therefore a different approach was used, where the Arduino's RAM memory boundaries were obtained in bytes (256 to 2303) and a random number between these values is chosen in the Python script and send to the Arduino. This new approach was successful.
 
 - Communication over Serial
 
@@ -243,14 +243,16 @@ The communication over serial was in times troublesome due too the way data has 
 
 - Types of variables
 
-The types of variables that were used in Arduino were difficult to use since it was not always  clear with what kind of variable was present and what kind of variable a specific function  required. This was also unclear due too the way that the communication over Serial was done, as previously described.
+The types of variables that were used in Arduino were difficult to use since it was not always clear with what kind of variable was present and what kind of variable a specific function required. This was also unclear due to the unknow method of the communication over serial, as previously described.
 
 ## Future work and recommendations
 
 After working on this project some recommendations for future work can be made and are listed below.
 
-The program should be tested using actual flight software. At the moment the software is running through some basic calculations and creation of lists which makes up the memory that can be subjected to bitflips. Since these calculations are relatively simple the memory area that is vulnerable or subject to bitflips is limited. Running the program on actual flight software will probably increase the likelihood of a memory location, where a bitflip is inflicted, containing information. This will in turn require the FDIR software to increase its capabilities of detecting errors caused by bitflips, therefore increasing the softwares capabilities.
+- The program should be tested using actual flight software. At the moment the software is running through some basic calculations and creation of lists which makes up the memory that can be subjected to bitflips. Since these calculations are relatively simple the memory area that is vulnerable or subject to bitflips is limited. Running the program on actual flight software will probably increase the likelihood of a memory location, where a bitflip is inflicted, containing information. This will in turn require the FDIR software to increase its capabilities of detecting errors caused by bitflips, therefore increasing the softwares capabilities.
 
-At the moment only error detection is performed while no error correction is done. In future software the ability to correct the errors caused by bitflips should be added since this is one of the requirements of FDIR software. The ability of the FDIR to correct detected errors is crucial for mission survival.
+- At the moment only error detection is performed while no error correction is done. In future software the ability to correct the errors caused by bitflips should be added since this is one of the requirements of FDIR software. The ability of the FDIR to correct detected errors is crucial for mission survival.
 
-Influence other memory types besides the Arduino's RAM memory. Next to the RAM memory which is the only memory currently subject to bitflips future work should include the other memory types of the on board computer that is used.
+- Influence other memory types besides the Arduino's RAM memory. Next to the RAM memory which is the only memory currently subject to bitflips future work should include the other memory types of the on board computer that is used.
+
+- Implementation of a SEU simulator. Right now the error are generated at random. However, a more realistic SEU simulator would also model different types of radiation. If for example part of the memory would be affected, this could results in more severe damage.
