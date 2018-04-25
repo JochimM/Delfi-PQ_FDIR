@@ -205,6 +205,8 @@ Below it can be found how the project can be build and used.
 
 The results of the bit flips in various memory locations (have a nice plot).
 
+After having the results for the bit flips in various memory locations, limited time was used to investigate the reason why the microcontroller is crashing or stops working. One of the reasons why this happens is found to be a change in local variables. Since one of these local variables is changing, the script does not know how to react, which results in a crash. 
+
 ## Unit tests
 
 ### Bit flip
