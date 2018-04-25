@@ -250,25 +250,36 @@ def errorcheck(varlist):       #Checks for errors in the received data
     
 #======================================
 
-def analyse():     #Analyse error locations
+def analyse(loc):     #Analyse error locations
 
-    if int(loc)<1000:
-        loc = int(loc)
+    loc = int(loc)
        
     if error == True:
-        locationy = int(loc)/8
+        locationy = loc/8
         locationx = loc-(8*locationy)
 
         error_true_locationy.append(locationy)
         error_true_locationx.append(locationx)
         
     if error == False:
-        locationy = int(loc)/8
+        locationy = loc/8
         locationx = loc-(8*locationy)
 
         error_false_locationy.append(locationy)
         error_false_locationx.append(locationx)        
 
+def checkToSend(varlist, allNames):
+    check = 0
+    for i in range(0, len(varlist)):
+        if varlist[i] in allNames:
+            check += 1
+            
+    if check == 5:
+        send = True
+    else:
+        send = False
+    return send
+    
 #======================================
 
 # THE DEMO PROGRAM STARTS HERE
@@ -287,8 +298,6 @@ ser = serial.Serial("/dev/ttyACM0", 9600)
 startMarker = 254
 endMarker = 255
 specialByte = 253
-
-
 
 waitForArduino()
 
@@ -312,58 +321,61 @@ name5 = '\xfe\x02Mem Rcvd\xff'
 name6 = '\xfe\x02Arduino working\xff'
 
 varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5, name6]
-
-numLoops = 1000
+allNames = []
+sendMemAddr = True
+numLoops = 10000
 n = 0
 waitingForReply = False
 nBitFlips = 0
+loc = "0000"
+
 while n < numLoops:
     
-    if np.random.rand() > 0.01:
-        print "LOOP " + str(n)
-        loc = randAddress()
-        teststr = "MA"+str(loc)
-        nBitFlips += 1
-        if ser.inWaiting() == 0 and waitingForReply == False:
-            sendToArduino(teststr)
-            #print "=====sent from PC=========="
-            #print "LOOP NUM " + str(n)
-            #print "BYTES SENT -> " + bytesToString(teststr)
-            #print "TEST STR " + teststr
-            #print "==========================="
-            waitingForReply = True
-           
-    
-        if ser.inWaiting > 0:
-            dataRecvd = recvFromArduino()
-    
-        if dataRecvd[0] == 0:
-            displayDebug(dataRecvd[1])
-    
-        if dataRecvd[0] > 0:
-            #displayData(dataRecvd[1])
-            #print "Reply Received"
-            n += 1
-            waitingForReply = False
-        if n > 0: 
-            error = errorcheck(varlist)
-            
-        if error:
-            varlist.append("\xfe\x02"+str(dataRecvd[1]+"\xff")
+    print "LOOP " + str(n)
 
-        
-        analyse()
-        
-        print error
     
-        print
-        print #"==========="
-        print
-    
-        time.sleep(0.05)
-    else:
-        time.sleep(0.05)
+    if ser.inWaiting() == 0 and waitingForReply == False and sendMemAddr:
+        loc = randAddress()
+        teststr = "MA"+str(loc)+"x"
+        sendToArduino(teststr)
+        nBitFlips += 1
+        #print "=====sent from PC=========="
+        #print "LOOP NUM " + str(n)
+        #print "BYTES SENT -> " + bytesToString(teststr)
+        #print "TEST STR " + teststr
+        #print "==========================="
+        
+        waitingForReply = True
+       
+
+    if ser.inWaiting > 0:
+        dataRecvd = recvFromArduino()
+
+    if dataRecvd[0] == 0:
+        displayDebug(dataRecvd[1])
+
+    if dataRecvd[0] > 0:
+        #displayData(dataRecvd[1])
+        #print "Reply Received"
         n += 1
+        waitingForReply = False
+    if n > 0: 
+        error = errorcheck(varlist)
+        allNames.append(dataRecvd[1])
+        sendMemAddr = checkToSend(varlist, allNames)
+        if sendMemAddr == True:
+            allNames = []
+        analyse(loc)
+        
+    if error:
+        varlist.append(str(dataRecvd[1]))
+
+    
+    
+    print error
+
+    time.sleep(0.05)
+
         
 plt.plot(error_true_locationx, error_true_locationy, 'ro')
 plt.plot(error_false_locationx, error_false_locationy, 'go')
