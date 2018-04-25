@@ -14,7 +14,7 @@ Besides, this repository consists of three verification Arduino files:
 
 - Pi_Calculation.ino: This file verifies the calculation of π, based on the Borwein algorithm, is working.
 - simplebitflip.ino: This file verifies the bit flip is working. This file changes the bit for a specified value (e.g. 1000) on a specified location (e.g. bit n° 4) and gives the new value.
-- checkMemAddr.ino: This file verifies the function to check the memoryy address and can be found in the MemAddrCheck folder.
+- checkMemAddr.ino: This file verifies the function to check the memoryy address and can be found in the checkMemAddr folder.
 
 Furthermore, note there is a trash folder for the user to see what was done, but was found to be unsuccessful. However, there is no documentation on this trash folder.
 
@@ -235,9 +235,19 @@ From the above result, it is clear the right number is obtained from the Borwein
 
 ### Check memory address
 
-checkMemAddr
+The verification of the check for the memory address can be found in checkMemAddr.ino in the checkMemAddr folder. As input, the following memory address is used:
 
+> char memAddressTry[] = "MA0276x";
 
+which is according the actual representation used in the main software. MA stands for memory address and the four following numbers represent the memory location. 'x' is used as terminator.
+
+This checkIfMemAddress function is checking if a memory message is received and is giving the memory location as output. With the above input, the expted result is 0276 as the memory location.
+
+The output when running this unit test is:
+
+> output = 276
+
+With this result, it can be concluded the function is performing according to the expectations.
 
 ## Project complications
 
