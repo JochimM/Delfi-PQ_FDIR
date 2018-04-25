@@ -14,8 +14,6 @@ void loop() {
   // put your main code here, to run repeatedly:
   Serial.println(*location);
   Serial.println(*location,BIN);
-  
-  int randI = random(0,16);
 
   bitFlip(location);
 }
@@ -24,7 +22,8 @@ void bitFlip(word *nearAddress)
 {
   word toChange = *nearAddress;
 
-  int randI = random(0,16);
+  // Choose which bit to switch. Note the count is from right to left.
+  int randI = 6;
 
   word Changed = toChange ^ ((1<<randI));
 

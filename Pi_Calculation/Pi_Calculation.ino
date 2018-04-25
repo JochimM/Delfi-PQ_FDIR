@@ -14,11 +14,11 @@ void loop() {
   // put your main code here, to run repeatedly:
   float pi;
   pi = getBorweinPi(y0, a0, n_iter);
-  char result[16]; // Buffer big enough for 7-character float
-  dtostrf(pi, 1, 14, result); //float goes up to 8 bytes in total (the comma is also a byte) 
+  char result[8]; // Buffer big enough for 7-character float
+  dtostrf(pi, 1, 6, result); //float goes up to 8 bytes in total (the comma is also a byte) 
   Serial.println(result);
 
-  delay(1000);
+  delay(10000);
 }
 
 float getBorweinPi(float y0, float a0, int n_iter)
