@@ -18,7 +18,7 @@ void loop() {
   dtostrf(pi, 1, 6, result); //float goes up to 8 bytes in total (the comma is also a byte) 
   Serial.println(result);
 
-  delay(10000);
+  delay(1000);
 }
 
 float getBorweinPi(float y0, float a0, int n_iter)
