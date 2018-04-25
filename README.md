@@ -10,11 +10,13 @@ Next to this README file including all necessary documentation, there are two ma
 - ArduinoPC.ino: This file is the Arduino script in the ArduinoPC folder.
 - ComArduino1.py: This file is the Python script.
 
-Besides, this repository consists of two verification Arduino files:
+Besides, this repository consists of three verification Arduino files:
 
 - Pi_Calculation.ino: This file verifies the calculation of π, based on the Borwein algorithm, is working.
 - simplebitflip.ino: This file verifies the bit flip is working. This file changes the bit for a specified value (e.g. 1000) on a specified location (e.g. bit n° 4) and gives the new value.
-- <span style="color:blue">*Folder with trash?*</span>
+- checkMemAddr.ino: This file verifies the function to check the memoryy address and can be found in the MemAddrCheck folder.
+
+Furthermore, note there is a trash folder for the user to see what was done, but was found to be unsuccessful. However, there is no documentation on this trash folder.
 
 ## Literature study
 
@@ -229,7 +231,13 @@ Using the following initial conditions:
 
 > output = 3.141593 ≈ π
 
-From the above result, it is clear the right number is obtained from the Borwein algorithm. 
+From the above result, it is clear the right number is obtained from the Borwein algorithm. Therefore, the π calculation is verified.
+
+### Check memory address
+
+checkMemAddr
+
+
 
 ## Project complications
 
