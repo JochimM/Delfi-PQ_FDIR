@@ -159,14 +159,14 @@ The Arduino will send a housekeeping message to the computer over serial connect
 - Strings: our names: Frederic, Jochim, Bas and Alexander
 - Borwein π: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached. 
 
-![img](http://latex.codecogs.com/svg.latex?y_%7Bk%2B1%7D%3D%5Cfrac%7B1-%281-y_k%5E4%29%5E%7B1%2F4%7D%7D%7B1-%281%2By_k%5E4%29%5E%7B1%2F4%7D%7D)
+    ![img](http://latex.codecogs.com/svg.latex?y_%7Bk%2B1%7D%3D%5Cfrac%7B1-%281-y_k%5E4%29%5E%7B1%2F4%7D%7D%7B1-%281%2By_k%5E4%29%5E%7B1%2F4%7D%7D)
 
-![img](http://latex.codecogs.com/svg.latex?a_%7Bk%2B1%7D%26%3Da_k%281%2By_%7Bk%2B1%7D%29%5E4-2%5E%7B2k%2B3%7Dy_%7Bk%2B1%7D%281%2By_%7Bk%2B1%7D%2By_%7Bk%2B1%7D%5E2%29)
+    ![img](http://latex.codecogs.com/svg.latex?a_%7Bk%2B1%7D%26%3Da_k%281%2By_%7Bk%2B1%7D%29%5E4-2%5E%7B2k%2B3%7Dy_%7Bk%2B1%7D%281%2By_%7Bk%2B1%7D%2By_%7Bk%2B1%7D%5E2%29)
 
-  The following initial conitions have to be used:
+    The following initial conitions have to be used:
 
-  - ![img](http://latex.codecogs.com/svg.latex?y_0%3D%5Csqrt%7B2%7D-1)
-  - ![img](http://latex.codecogs.com/svg.latex?a_0%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
+    - ![img](http://latex.codecogs.com/svg.latex?y_0%3D%5Csqrt%7B2%7D-1)
+    - ![img](http://latex.codecogs.com/svg.latex?a_0%3D2%28%5Csqrt%7B2%7D-1%29%5E2)
 ### Reboot message
 At booting, the Arduino sends out a message to the PC: "Arduino Reset".  This can be used to keeptrack of the amount of times the Arduino has rebooted.
 ### Visual check
@@ -184,7 +184,7 @@ Below it can be found how the project can be build and used.
 5. Open the file "ComArduino.py"
 6. Select the port that the Arduino is connected with. The name of the port can be found in the Arduino IDE. For the example below, this is "COM5".
 
-![img](https://i.imgur.com/N2y2760.png)
+![img](https://i.imgur.com/7hNDMa7.png)
 
 7. Run the Python script (F5). The script should be working now and detect errors in the RAM memory.
 
@@ -233,15 +233,15 @@ From the above result, it is clear the right number is obtained from the Borwein
 
 ## Project complications
 
-Pointer, memory locations
+- Pointer, memory locations
 
 Issues arose when trying to use the pointer with varying formats of the memory locations. At first it was tried to use the following format of memory location: 0x000F where the last three digits were randomnly determined. This however was proven unsuitable for use with the pointer, therefore a different approach was used, where the Arduino's RAM memory boundaries were obtained in bytes (256 to 2303) and a random number between these values is chosen in the Python script and send to the Arduino. This new approach did work.
 
-Communication over Serial
+- Communication over Serial
 
 The communication over serial was in times troublesome due too the way data has to be send over from Python to Arduino and vice versa. When viewing both scripts it can be seen that before data can be send a specific function is used to encode the data in the proper format, for example adding start and end markers to the string that is send over. Next to that before the data can be read its needs to be decoded again. It has taken some time to get used to the way or format that data has to be send over and can be read afterwards in each respective program.
 
-Types of variables
+- Types of variables
 
 The types of variables that were used in Arduino were difficult to use since it was not always  clear with what kind of variable was present and what kind of variable a specific function  required. This was also unclear due too the way that the communication over Serial was done, as previously described.
 
