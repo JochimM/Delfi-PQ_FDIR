@@ -3,6 +3,17 @@
 ## Description and purpose of the project
 Fault Detection, Isolation and Recovery (FDIR) is a vital part of satellite systems engineering due to the harmful effects of radiation in space. Testing of the FDIR system is challenging and especially lacks experience for CubeSats. This project aims to develop open-source software for testing and analyzing FDIR systems, suitable for continuous integration. The developed software will be modular and should be easy to adapt for uses other than the test case. Furthermore, the developed tool will serve to test the FDIR systems on the Delfi-PQ, a 3U PocketCube, developed at Delft University of Technology, which will function as a platform for technology demonstration and education. 
 
+During the process of this project, some design choices were made and are listed below:
+
+- The protocol was kept as simple as possible, as this was the first experience with data error analysis using a microcontroller. Therefore, it was decided to send the data with a fixed structure. The data consists of a startmarker (character 254) indicating the beginning of the message followed by the number of bytes in the message (count byte), and an endmarker (character 255) indicating the end of the message. Furthermore the special byte (character 253) was used in case the begin or end marker was used in the real message of the data sent.
+
+- Again for the sake of simplicity, it was decided to only work with characters as the type of the data.
+
+- To access the memory, it was decided to only access part of the RAM. For the scope of this project, this was sufficient. To access other parts of the memory, more experience would be required with assembler.
+
+- Due to time constraints, flipping of a bit is done in a random fashion in the Arduino script. In a later stage, it would be adviced to choose the location of the bit to be flipped, in order to investigate what location of a bit flip causes more problems. 
+
+
 ## Repository overview
 
 Next to this README file including all necessary documentation, there are two main files required to use the software: 
@@ -274,3 +285,5 @@ After working on this project some recommendations for future work can be made a
 - Influence other memory types besides the Arduino's RAM memory. Next to the RAM memory which is the only memory currently subject to bitflips future work should include the other memory types of the on board computer that is used.
 
 - Implementation of a SEU simulator. Right now the error are generated at random. However, a more realistic SEU simulator would also model different types of radiation. If for example part of the memory would be affected, this could results in more severe damage.
+
+- Analysing different data types, as for now only characters are used as data. 
