@@ -1,6 +1,6 @@
 boolean memReceived = false;
 int memAddress;
-char memAddressTry[] = "MA1276x";
+char memAddressTry[] = "MA0276x";
 
 void setup() {
   // put your setup code here, to run once:
@@ -18,7 +18,7 @@ void loop() {
 
 void checkIfMemAddress(char arr[]){
   int arrLength = 4;
-  Serial.println(arrLength);
+  //Serial.println(arrLength);
   char memAddressCh[arrLength];
   if ((arr[0] == 'M') && (arr[1] == 'A')){
     //blinkLED(1);
