@@ -95,7 +95,7 @@ The time and memory address of all error injections will be stored and will be u
 On a memory map (rectangular) with three different colors for three gradations in errors.
 
 ## Structure of software and hardware interface
-For the purpose of testing the FDIR testing software, an Arduino Uno board serves as hardware, representing the OBC of a CubeSat. Furthermore, a serial connection provides the communication with the PC to read out the performance of the software,  written in Python.
+For the purpose of testing the FDIR testing software, an Arduino Uno board serves as hardware, representing the OBC of a CubeSat. Furthermore, a serial connection provides the communication with the PC to read out the performance of the software,  written in Python. Note that the maximum length of the message is set to 16 bits. 
 
 ### Arduino Block diagram
 
