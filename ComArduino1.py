@@ -239,25 +239,11 @@ def randAddress():
 #======================================
 
 
-def errorcheck():       #Checks for errors in the received data
+def errorcheck(varlist):       #Checks for errors in the received data
 
 # Needs to check for errors in the calculations that are made by the Arduino, this means the calc for pi,names
 # and other stuff
-    pie = math.pi
-    pie = "{0:.6f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
-    
-    name1 = "\xfe\x02Alexander\xff"
-    name2 = '\xfe\x02Jochim\xff'
-    name3 = '\xfe\x02Frederic\xff'
-    name4 = '\xfe\x02Bas\xff'  
-    name5 = '\xfe\x02Arduino Reset\xff'
-    
-    
-    
-    
-    
-    varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5]
-    
+   
     error = True
     
     if (dataRecvd[1]) in varlist:
@@ -274,18 +260,17 @@ def errorcheck():       #Checks for errors in the received data
 
 def analyse(loc):     #Analyse error locations
 
-    if int(loc)<1000:
-        loc = int(loc)
+    loc = int(loc)
        
     if error == True:
-        locationy = int(loc)/8
+        locationy = loc/8
         locationx = loc-(8*locationy)
 
         error_true_locationy.append(locationy)
         error_true_locationx.append(locationx)
         
     if error == False:
-        locationy = int(loc)/8
+        locationy = loc/8
         locationx = loc-(8*locationy)
 
         error_false_locationy.append(locationy)
@@ -317,6 +302,17 @@ ser = serial.Serial("/dev/ttyACM1", 20000)
 startMarker = 254
 endMarker = 255
 specialByte = 253
+
+pie = math.pi
+pie = "{0:.6f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
+    
+name1 = "\xfe\x02Alexander\xff"
+name2 = '\xfe\x02Jochim\xff'
+name3 = '\xfe\x02Frederic\xff'
+name4 = '\xfe\x02Bas\xff'  
+name5 = '\xfe\x02Arduino Reset\xff'
+    
+varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5]
 
 
 
@@ -382,7 +378,10 @@ while n < numLoops:
             
             
     if n > 0: 
-        error = errorcheck()
+        error = errorcheck(varlist)
+
+    if error:
+        varlist.append(str(dataRecvd[1]))
         
     
     analyse(loc)
@@ -396,9 +395,8 @@ while n < numLoops:
     time.sleep(0.01)
     
 
-        
-plt.plot(error_true_locationx, error_true_locationy, 'ro')
 plt.plot(error_false_locationx, error_false_locationy, 'go')
+plt.plot(error_true_locationx, error_true_locationy, 'ro')
 plt.show()
         
 ser.close()
