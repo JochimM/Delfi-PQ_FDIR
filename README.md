@@ -1,7 +1,7 @@
 # Delfi-PQ_FDIR
 
 ## Description and purpose of the project
-Fault Detection, Isolation and Recovery (FDIR) is a vital part of satellite systems engineering due to the harmful effects of radiation in space. Testing of the FDIR system is challenging and especially lacks experience for CubeSats. This project aims to develop open-source software for testing and analysing FDIR systems, suitable for continuous integration. The developed software will be modular and should be easy to adapt for uses other than the test case. Furthermore, the developed tool will serve to test the FDIR systems on the Delfi-PQ, a 3U PocketCube, developed at Delft University of Technology, which will function as a platform for technology demonstration and education. 
+Fault Detection, Isolation and Recovery (FDIR) is a vital part of satellite systems engineering due to the harmful effects of radiation in space. Testing of the FDIR system is challenging and especially lacks experience for CubeSats. This project aims to develop open-source software for testing and analysing FDIR systems, suitable for continuous integration. The developed software is intented to be modular and should be easy to adapt for uses other than the test case. Furthermore, the developed tool will serve to test the FDIR systems on the Delfi-PQ, a 3U PocketCube, developed at Delft University of Technology, which will function as a platform for technology demonstration and education. 
 
 During the process of this project, some design choices were made and are listed below:
 
@@ -53,7 +53,7 @@ Note that an SEU in itself is not considered to be permanently damaging to the f
 
 ### How could you model SEU’s?
 
-Literature exists on modelling the SEU rates for a given piece of hardware at a given orbit and radiation environment. However, this is out of the scope of this project. SEU’s will be modelled randomly:
+Literature exists on modelling the SEU rates for a given piece of hardware at a given orbit and radiation environment. However, this is out of the scope of this project. SEU’s are be modelled randomly:
 
 - The rate of errors is determined randomly (e.g. uniform distribution).
 - The location of the error is determined randomly (e.g. uniform distribution).
@@ -67,7 +67,7 @@ The memory on the Arduino can be accessed randomly. The memory access is done us
 Only into the SRAM, not into the part where the bootloader is stored, otherwise serial communication is not possible anymore and the Arduino will no longer be able to reboot until we flash the bootloader again. 
 The specific locations this code targets are in the interval [257, 2303].
 
-There will also have to be some code on the Arduino which has to inject the errors into the memory at the memory locations it receives through serial. This code should also not be injected with errors. 
+There also has to be some code on the Arduino which has to inject the errors into the memory at the memory locations it receives through serial. This code should also not be injected with errors. 
 
 ### How will we determine whether an error has occurred? 
 
@@ -90,7 +90,7 @@ Fatal errors are worse than a watchdog reset, which is again worse than wrong ou
 
 ### How do we interface with the error simulation to know what part of the memory caused the error?
 
-The memory address of all error injections will be stored and will be used for the interface with the error analysis software.
+The memory address of all error injections is stored and used for the interface with the error analysis software.
 
 ### How do we want to visualize the critical memory locations?
 
@@ -166,7 +166,7 @@ The flight software consists of several modules which have to be checked by the 
 In order to verify whether the flight software is functioning as desired, a watchdog kicker is implemented in the flight software. The system is typically designed so that the watchdog timer will be kicked only if the computer considers the system functional. The computer determines whether the system is functional by conducting one or more fault detection tests and it will kick the watchdog only if all tests have passed. Whenever the Arduino fails to reset the watchdog timer, the board will reset. Before resetting, a set of actions can be defined to take place. One option for this would be to store some important parameters in the EEPROM memory so they can be used again after reboot.
 
 ### Housekeeping Data
-The Arduino will send a housekeeping message to the computer over serial connection at set intervals. These housekeeping messages will provide information to the error analysis software about the functionality of the software. Currently, three housekeeping modules are implemented, which can be extended at anytime. These are:
+The Arduino sends a housekeeping message to the computer over serial connection at set intervals. These housekeeping messages provides information to the error analysis software about the functionality of the software. Currently, three housekeeping modules are implemented, which can be extended at anytime. These are:
 - Strings: our names: Frederic, Jochim, Bas and Alexander.
 - Borwein π: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached. 
 
@@ -181,9 +181,9 @@ The Arduino will send a housekeeping message to the computer over serial connect
 ### Reboot message
 At booting, the Arduino sends out a message to the PC: "Arduino Reset".  This can be used to keep track of the amount of times the Arduino has rebooted.
 ### Visual check
-The on-board LED will be set to blink at set intervals to enable visual inspection of the correct functioning of the software.
+The on-board LED is set to blink at set intervals to enable visual inspection of the correct functioning of the software.
 
-Note: The time intervals are to be determined. The on-board watchdog timer on the Arduino board can be set to no more than 8000 ms, so the intervals mentioned above will have to be at least shorter than 8000 ms.
+Note: The time intervals are to be determined. The on-board watchdog timer on the Arduino board can be set to no more than 8000 ms, so the intervals mentioned above are at least shorter than 8000 ms.
 
 ## Running of the code
 Below it can be found how the project can be build and used.
@@ -292,4 +292,4 @@ After working on this project some recommendations for future work can be made a
 
 - Analysing different data types, as for now only characters are used as data. 
 
-- Implement the pingFromPC function. This would reset the watchdog timer on the arduino only if the python programme sends a specific 'kick' message. This can be used to reset the board from the python programme out. 
+- Implement the pingFromPC function. This would reset the watchdog timer on the Arduino only if the Python programme sends a specific 'kick' message. This can be used to reset the board from the python programme. 
