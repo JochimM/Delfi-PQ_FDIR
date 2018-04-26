@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr 25 22:22:34 2018
+
+@author: alexander
+"""
 # 12 Mar 2014
 
 # in case any of this upsets Python purists it has been converted from an equivalent JRuby program
@@ -223,7 +229,7 @@ def waitForArduino():
 
 def randAddress():
     
-    location = random.randint(10,500) #2303
+    location = random.randint(257,1500) #2303
     if location < 1000:
         location = "0"+ str(location)
         
@@ -233,10 +239,24 @@ def randAddress():
 #======================================
 
 
-def errorcheck(varlist):       #Checks for errors in the received data
+def errorcheck():       #Checks for errors in the received data
 
 # Needs to check for errors in the calculations that are made by the Arduino, this means the calc for pi,names
 # and other stuff
+    pie = math.pi
+    pie = "{0:.6f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
+    
+    name1 = "\xfe\x02Alexander\xff"
+    name2 = '\xfe\x02Jochim\xff'
+    name3 = '\xfe\x02Frederic\xff'
+    name4 = '\xfe\x02Bas\xff'  
+    name5 = '\xfe\x02Arduino Reset\xff'
+    
+    
+    
+    
+    
+    varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5]
     
     error = True
     
@@ -246,43 +266,37 @@ def errorcheck(varlist):       #Checks for errors in the received data
     if error:
         print (dataRecvd)
         print 'Error'
-        
-    return error 
+    
+    return error
     
 
 #======================================
 
 def analyse(loc):     #Analyse error locations
 
-    loc = int(loc)
+    if int(loc)<1000:
+        loc = int(loc)
        
     if error == True:
-        locationy = loc/8
+        locationy = int(loc)/8
         locationx = loc-(8*locationy)
 
         error_true_locationy.append(locationy)
         error_true_locationx.append(locationx)
         
     if error == False:
-        locationy = loc/8
+        locationy = int(loc)/8
         locationx = loc-(8*locationy)
 
         error_false_locationy.append(locationy)
-        error_false_locationx.append(locationx)      
+        error_false_locationx.append(locationx)        
 
-def checkToSend(allNames, varList):
-    check = 0
-    
-    for i in range(0, len(allNames)):
-        if allNames[i] in varList:
-            check += 1
-    if check >= 5:
+def checkToSend(allNames):
+              
+    if len(allNames) >= 5:
         send = True
-    
     else:
-        send = False                 
-    
-    
+        send = False
     return send
         
 #======================================
@@ -297,7 +311,7 @@ import numpy as np
 
 # NOTE the user must ensure that the next line refers to the correct comm port
 
-ser = serial.Serial("/dev/ttyACM2", 19200)
+ser = serial.Serial("/dev/ttyACM1", 20000)
 
 
 startMarker = 254
@@ -310,45 +324,32 @@ waitForArduino()
 
 print "Arduino is ready"
 
-rreboots = 0
+reboots = 0
 error_true_locationy = []
 error_true_locationx = []
 error_false_locationy = []
 error_false_locationx = []
 error = False
 
-pie = math.pi
-pie = "{0:.6f}".format(pie) #Enter the number of decimals that is calculated in Arduino for Pi, rounded here
-    
-name1 = "\xfe\x02Alexander\xff"
-name2 = '\xfe\x02Jochim\xff'
-name3 = '\xfe\x02Frederic\xff'
-name4 = '\xfe\x02Bas\xff'  
-name5 = '\xfe\x02Mem Rcvd\xff'
-name6 = '\xfe\x02Arduino working\xff'
-
-varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5, name6]
-
 numLoops = 10000
 n = 0
 waitingForReply = False
 nBitFlips = 0
 allNames = []
-sendMemAddr = False
+sendMemAddr = True
 loc = "0000"
 
 while n < numLoops:
     
     
     print "LOOP " + str(n)
-    
+    print ser.inWaiting()
     if ser.inWaiting() == 0 and waitingForReply == False and sendMemAddr:
         loc = randAddress()
-        print "Memory Address Sent"
-        time.sleep(0.5)
-        teststr = "MA"+str(loc)+"x"
+        teststr = "MA" + str(loc)+"x"
         nBitFlips += 1
         sendToArduino(teststr)
+        print "sent memadd"
         #print "=====sent from PC=========="
         #print "LOOP NUM " + str(n)
         #print "BYTES SENT -> " + bytesToString(teststr)
@@ -369,20 +370,31 @@ while n < numLoops:
         n += 1
         waitingForReply = False
         allNames.append(dataRecvd[1])
-        sendMemAddr = checkToSend(allNames, varlist)
+        sendMemAddr = checkToSend(allNames)
+        
         if sendMemAddr == True:
             allNames = []
-        analyse(loc)
+            nBitFlips += 1
+            print len(allNames)
+        if dataRecvd[1] == '\xfe\x02Arduino Reset\xff':
+            time.sleep(0.1)
+            reboots += 1
+            
             
     if n > 0: 
-        error = errorcheck(varlist)
+        error = errorcheck()
         
-    if error:
-        varlist.append(str(dataRecvd[1]))
     
-  
+    analyse(loc)
+    
+    print error
 
-    time.sleep(0.05)
+    print
+    print #"==========="
+    print
+    
+    time.sleep(0.01)
+    
 
         
 plt.plot(error_true_locationx, error_true_locationy, 'ro')
