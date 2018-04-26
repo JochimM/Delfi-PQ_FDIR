@@ -97,7 +97,7 @@ The memory address of all error injections will be stored and will be used for t
 On a memory map (rectangular) with red indicating an error occurred due to a bitflip at that location.
 
 ## Structure of software and hardware interface
-For the purpose of testing the FDIR testing software, an Arduino Uno board serves as hardware, representing the OBC of a CubeSat. Furthermore, a serial connection provides the communication with the PC to read out the performance of the software,  written in Python.
+For the purpose of testing the FDIR testing software, an Arduino Uno board serves as hardware, representing the OBC of a CubeSat. Furthermore, a serial connection provides the communication with the PC to read out the performance of the software,  written in Python. Note that the maximum length of the message is set to 16 bits. 
 
 ### Arduino Block diagram
 
@@ -113,7 +113,7 @@ After initialising and setting the initial values in the setup function, the Loo
 - processData<sup>(7)</sup>
 - sendHouseKeep<sup>(14)</sup>
 
-The getSerialData(4) function receives the data coming from the serial connection and puts it into temp-Buffer<sup>(5)</sup>. It recognizes a new message when the startMarker (byte: 254) is read and the end is marked with the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
+The getSerialData(4) function, put in an if-loop for when the microcontroller is receiving data, receives the data coming from the serial connection and puts it into temp-Buffer<sup>(5)</sup>. It recognizes a new message when the startMarker (byte: 254) is read and the end is marked with the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
 
 The message sent from the PC is given as follows:
 
@@ -273,6 +273,10 @@ The communication over serial was in times troublesome due to the way data has t
 - Types of variables
 
 The types of variables that were used in Arduino were difficult to distinguish since it was not always clear what kind of variable was present and what kind of variable a specific function required. This was also unclear due to the unknown method of the communication over serial, as previously described.
+
+- Reading of the data
+
+In the later phase of the project, it was discovered that the programme was constantly reading one single byte using 'serial.read' and consequently sending the housekeeping data. Changing it to 'serial.readbytesuntil' fixed this issue. Now, the microcontroller first reads the entire message in one go before sending the housekeeping data back to the PC.
 
 ## Future work and recommendations
 
