@@ -1,17 +1,17 @@
 # Delfi-PQ_FDIR
 
 ## Description and purpose of the project
-Fault Detection, Isolation and Recovery (FDIR) is a vital part of satellite systems engineering due to the harmful effects of radiation in space. Testing of the FDIR system is challenging and especially lacks experience for CubeSats. This project aims to develop open-source software for testing and analysing FDIR systems, suitable for continuous integration. The developed software will be modular and should be easy to adapt for uses other than the test case. Furthermore, the developed tool will serve to test the FDIR systems on the Delfi-PQ, a 3U PocketCube, developed at Delft University of Technology, which will function as a platform for technology demonstration and education. 
+Fault Detection, Isolation and Recovery (FDIR) is a vital part of satellite systems engineering due to the harmful effects of radiation in space. Testing of the FDIR system is challenging and especially lacks experience for CubeSats. This project aims to develop open-source software for testing and analysing FDIR systems, suitable for continuous integration. The developed software is intented to be modular and should be easy to adapt for uses other than the test case. Furthermore, the developed tool will serve to test the FDIR systems on the Delfi-PQ, a 3U PocketCube, developed at Delft University of Technology, which will function as a platform for technology demonstration and education. 
 
 During the process of this project, some design choices were made and are listed below:
 
-- The protocol was kept as simple as possible, as this was the first experience with data error analysis using a microcontroller. Therefore, it was decided to send the data with a fixed structure. The data consists of a startmarker (character 254) indicating the beginning of the message followed by the number of bytes in the message (count byte), and an endmarker (character 255) at the very end indicating the end of the message. Furthermore the special byte (character 253) was used in case the begin or end marker was used in the real message of the data sent.
+- The protocol was kept as simple as possible, as this was the first experience with data error analysis using a microcontroller. Therefore, it was decided to send the data with a fixed structure. The data consists of a startmarker (character 254) indicating the beginning of the message followed by the number of bytes in the message (count byte), and an endmarker (character 255) at the very end indicating the end of the message. Furthermore the special byte (character 253) was used in case the begin or end marker was used in the real message of the data sent. A message is defined to be at most 16 bytes long, including the protocol characters. This means that at most 13 bytes are available for sending data. This can easily be changed in the Arduino code by changing maxMessage to a higher value.
 
 - Again for the sake of simplicity, it was decided to only work with characters as the type of the data.
 
 - To access the memory, it was decided to only access part of the SRAM. For the scope of this project, this was sufficient. To access other parts of the memory, more experience would be required with assembler.
 
-- Due to time constraints, flipping of a bit is done in a random fashion in the Arduino script. In a later stage, it would be adviced to choose the location of the bit to be flipped, in order to investigate what location of a bit flip causes more problems. 
+- Due to time constraints, flipping of a bit is done in a random fashion in the byte location that gets sent to the Arduino script. In a later stage, it would be adviced to choose the location of the bit to be flipped, in order to investigate more precisely what location of a bit flip causes more problems. 
 
 
 ## Repository overview
@@ -53,24 +53,25 @@ Note that an SEU in itself is not considered to be permanently damaging to the f
 
 ### How could you model SEU’s?
 
-Literature exists on modelling the SEU rates for a given piece of hardware at a given orbit and radiation environment. However, this is out of the scope of this project. SEU’s will be modelled randomly:
+Literature exists on modelling the SEU rates for a given piece of hardware at a given orbit and radiation environment. However, this is out of the scope of this project. SEU’s are be modelled randomly:
 
 - The rate of errors is determined randomly (e.g. uniform distribution).
 - The location of the error is determined randomly (e.g. uniform distribution).
 
 ### How can we access the memory on the Arduino?
 
-The memory on the Arduino can be accessed randomly.
+The memory on the Arduino can be accessed randomly. The memory access is done using pointers. The pointers are randomly generated on python as strings, then sent to arduino as characters, converted to ints and then accessed in arduino.
 
 ### What parts of the memory should we inject errors into?
 
 Only into the SRAM, not into the part where the bootloader is stored, otherwise serial communication is not possible anymore and the Arduino will no longer be able to reboot until we flash the bootloader again. 
+The specific locations this code targets are in the interval [257, 2303].
 
-There will also have to be some code on the Arduino which has to inject the errors into the memory at the memory locations it receives through serial. This code should also not be injected with errors. 
+There also has to be some code on the Arduino which has to inject the errors into the memory at the memory locations it receives through serial. This code should also not be injected with errors. 
 
 ### How will we determine whether an error has occurred? 
 
-This will be done by analysing the housekeeping messages through the Python script.
+This is done by analysing the housekeeping messages through the Python script.
 
 ### What is an error?
 
@@ -81,6 +82,7 @@ Any malfunctioning of the flight software.
 - Bad outputs
 - Watchdog resets (the watchdog doesn't get kicked)
 - Fatal errors (the Arduino stops working and resets)
+- Errors in the communication protocol
 
 ### Will there be gradations in errors?
 
@@ -88,14 +90,14 @@ Fatal errors are worse than a watchdog reset, which is again worse than wrong ou
 
 ### How do we interface with the error simulation to know what part of the memory caused the error?
 
-The time and memory address of all error injections will be stored and will be used for the interface with the error analysis software.
+The memory address of all error injections is stored and used for the interface with the error analysis software.
 
 ### How do we want to visualize the critical memory locations?
 
-On a memory map (rectangular) with three different colors for three gradations in errors.
+On a memory map (rectangular) with red indicating an error occurred due to a bitflip at that location.
 
 ## Structure of software and hardware interface
-For the purpose of testing the FDIR testing software, an Arduino Uno board serves as hardware, representing the OBC of a CubeSat. Furthermore, a serial connection provides the communication with the PC to read out the performance of the software,  written in Python.
+For the purpose of testing the FDIR testing software, an Arduino Uno board serves as hardware, representing the OBC of a CubeSat. Furthermore, a serial connection provides the communication with the PC to read out the performance of the software,  written in Python. Note that the maximum length of the message is set to 16 bits. 
 
 ### Arduino Block diagram
 
@@ -111,7 +113,7 @@ After initialising and setting the initial values in the setup function, the Loo
 - processData<sup>(7)</sup>
 - sendHouseKeep<sup>(14)</sup>
 
-The getSerialData(4) function receives the data coming from the serial connection and puts it into temp-Buffer<sup>(5)</sup>. It recognizes a new message when the startMarker (byte: 254) is read and the end is marked with the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
+The getSerialData(4) function, put in an if-loop for when the microcontroller is receiving data, receives the data coming from the serial connection and puts it into temp-Buffer<sup>(5)</sup>. It recognizes a new message when the startMarker (byte: 254) is read and the end is marked with the endMarker (byte: 255). The number of bytes sent by the PC are saved in tempBuffer.
 
 The message sent from the PC is given as follows:
 
@@ -164,7 +166,7 @@ The flight software consists of several modules which have to be checked by the 
 In order to verify whether the flight software is functioning as desired, a watchdog kicker is implemented in the flight software. The system is typically designed so that the watchdog timer will be kicked only if the computer considers the system functional. The computer determines whether the system is functional by conducting one or more fault detection tests and it will kick the watchdog only if all tests have passed. Whenever the Arduino fails to reset the watchdog timer, the board will reset. Before resetting, a set of actions can be defined to take place. One option for this would be to store some important parameters in the EEPROM memory so they can be used again after reboot.
 
 ### Housekeeping Data
-The Arduino will send a housekeeping message to the computer over serial connection at set intervals. These housekeeping messages will provide information to the error analysis software about the functionality of the software. Currently, three housekeeping modules are implemented, which can be extended at anytime. These are:
+The Arduino sends a housekeeping message to the computer over serial connection at set intervals. These housekeeping messages provides information to the error analysis software about the functionality of the software. Currently, three housekeeping modules are implemented, which can be extended at anytime. These are:
 - Strings: our names: Frederic, Jochim, Bas and Alexander.
 - Borwein π: The following simple algorithm approximates the value of 1/π in an iterative way. This Borwein algorithm has quartic convergence properties, such that with only a few iterations, a reasonable approximation is reached. 
 
@@ -179,9 +181,9 @@ The Arduino will send a housekeeping message to the computer over serial connect
 ### Reboot message
 At booting, the Arduino sends out a message to the PC: "Arduino Reset".  This can be used to keep track of the amount of times the Arduino has rebooted.
 ### Visual check
-The on-board LED will be set to blink at set intervals to enable visual inspection of the correct functioning of the software.
+The on-board LED is set to blink at set intervals to enable visual inspection of the correct functioning of the software.
 
-Note: The time intervals are to be determined. The on-board watchdog timer on the Arduino board can be set to no more than 8000 ms, so the intervals mentioned above will have to be at least shorter than 8000 ms.
+Note: The time intervals are to be determined. The on-board watchdog timer on the Arduino board can be set to no more than 8000 ms, so the intervals mentioned above are at least shorter than 8000 ms.
 
 ## Running of the code
 Below it can be found how the project can be build and used.
@@ -200,6 +202,10 @@ Below it can be found how the project can be build and used.
 ## Results
 
 The results of the bit flips in various memory locations (have a nice plot).
+
+![img](https://i.imgur.com/nnuJHEN.png)
+
+![img](https://i.imgur.com/htH8T1s.png)
 
 After having the results for the bit flips in various memory locations, limited time was used to investigate the reason why the microcontroller is crashing or stops working. One of the reasons why this happens is found to be a change in local variables. Since one of these local variables is changing, the script does not know how to react, which results in a crash. 
 
@@ -250,7 +256,7 @@ The verification of the check for the memory address can be found in checkMemAdd
 
 which is according to the actual representation used in the main software. MA stands for memory address and the four following numbers represent the memory location. 'x' is used as terminator.
 
-This checkIfMemAddress function is checking if a memory message is received and is giving the memory location as output. With the above input, the expected result is '0276' as the memory location.
+This checkIfMemAddress function is checking if a memory message is received and is giving the memory location as output. With the above input, the expected result is '276' as the memory location.
 
 The output when running this unit test is:
 
@@ -266,11 +272,15 @@ Issues arose when trying to use the pointer with varying formats of the memory l
 
 - Communication over Serial
 
-The communication over serial was in times troublesome due to the way data has to be send over from Python to Arduino and vice versa. When viewing both scripts it can be seen that before data can be send a specific function is used to encode the data in the proper format, for example adding start and end markers to the string that is sent. Next to that, before the data can be read, it needs to be decoded again. It has taken some time to get used to the way data has to be sent and can be read afterwards in each respective programme.
+The communication over serial was in times troublesome due to the way data has to be send over from Python to Arduino and vice versa. When viewing both scripts it can be seen that before data can be send a specific function is used to encode the data in the proper format, for example adding start and end markers to the string that is sent. Next to that, before the data can be read, it needs to be decoded again. It has taken some time to get used to the way data has to be sent and can be read afterwards in each respective programme. Alot of the problems that occurred were due to the fact that the program was first setup to read the incoming messages byte by byte. It would read one byte, then perform the rest of the main arduino loop, then read the next byte, etc. Once a complete message was received it would perform the bitflip. This made it impossible to know where errors came from and was changed to read the message in its entirety before executing the rest of the main loop.
 
 - Types of variables
 
 The types of variables that were used in Arduino were difficult to distinguish since it was not always clear what kind of variable was present and what kind of variable a specific function required. This was also unclear due to the unknown method of the communication over serial, as previously described.
+
+- Reading of the data
+
+In the later phase of the project, it was discovered that the programme was constantly reading one single byte using 'serial.read' and consequently sending the housekeeping data. Changing it to 'serial.readbytesuntil' fixed this issue. Now, the microcontroller first reads the entire message in one go before sending the housekeeping data back to the PC.
 
 ## Future work and recommendations
 
@@ -285,3 +295,5 @@ After working on this project some recommendations for future work can be made a
 - Implementation of a SEU simulator. Right now the errors are generated at random. However, a more realistic SEU simulator would also model different types of radiation. If for example part of the memory would be affected, this could results in more severe damage.
 
 - Analysing different data types, as for now only characters are used as data. 
+
+- Implement the pingFromPC function. This would reset the watchdog timer on the Arduino only if the Python programme sends a specific 'kick' message. This can be used to reset the board from the python programme. 

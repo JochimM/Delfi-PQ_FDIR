@@ -45,8 +45,6 @@ int n_iter = 10;
 
 int loopCounter = 0;
 
-byte testVar = 1000;
-
 char houseKeep[] = "Frederic";
 char houseKeep1[] = "Jochim";
 char houseKeep2[] = "Bas";
@@ -60,14 +58,14 @@ void setup() {
   debugToPC(debugMsg);
   blinkLED(5); // just so we know it's alive
   watchdogSetup();
-  Serial.setTimeout(1000);
+  Serial.setTimeout(10000);
 }
 
 //================
 
 void loop() {
   if (receiving){
-    Serial.setTimeout(400);
+    Serial.setTimeout(1000);
     getSerialData();
   }
   processData(dataRecvd);
@@ -123,34 +121,14 @@ void getSerialData() {
      //   uses decodeHighBytes() to copy data from tempBuffer to dataRecvd[]
      
      // the Arduino program will use the data it finds in dataRecvd[]
-
-  //if(Serial.available() > 0) {
   char tempBufferC[maxMessage]; 
-  Serial.readBytesUntil(255, tempBufferC, maxMessage);
-//    byte x = Serial.read();
-//    if (x == startMarker) { 
-//      bytesRecvd = 0; 
-//      inProgress = true;
-//      
-//      // debugToPC("start received");
-//    }
-//      
-//    if(inProgress) {
-//      tempBuffer[bytesRecvd] = x;
-//      bytesRecvd ++;
-//    }
-//
-//    if (x == endMarker) {
+  Serial.readBytesUntil(endMarker, tempBufferC, maxMessage);
+
   inProgress = false;
   allReceived = true;
   receiving = false;
-  //sendHouseKeepCheck = true;
-  
+
   dataSentNum = tempBufferC[1];
-//      char buff2[32];
-//      sprintf(buff2, "NumBytes = %d", dataSentNum); 
-//      dataToPC(buff2);
-  //sprintf(tempBuffer, "00MA0276x0");
   decodeHighBytes(tempBufferC);
   //checkIfMemAddress();
   //dataToPC(dataRecvd);
@@ -168,18 +146,10 @@ void processData(char arr[]) {
     checkIfMemAddress(arr);
     //pingFromPC(arr);
     if (memReceived) {
-      
-      dataSendStr = "Mem Rcvd";
-      bitFlip(memAddress);
-      
+      bitFlip(memAddress);  
     }
     
-    dataSendStr.toCharArray(dataSend, maxMessage);
     allReceived = false;
-    //dataToPC(dataSend);
-    //wdt_reset();
-    //delay(100);
-     
     
   }
 }
@@ -196,7 +166,6 @@ void decodeHighBytes(char arr[]) {
     byte x = arr[n];
     
     if (x == specialByte) {
-       // debugToPC("FoundSpecialByte");
        n++;
        x = x + arr[n];
     }
@@ -304,41 +273,25 @@ void bitFlip(int nearAddress)
 
 void checkIfMemAddress(char arr[]){
   int arrLength = 4;
-  //Serial.println(arrLength);
   char memAddressCh[arrLength];
   if ((arr[0] == 'M') && (arr[1] == 'A')){
-    //wdt_reset();
-    
     byte n = 2;
     boolean notDone = true;
     while(notDone) {
       if (arr[n] != 'x'){
         memAddressCh[n-2] = arr[n];
         n ++;
-        //blinkLED(1);
-        //delay(500);
       }
       else {
         notDone = false;
         }
-      
-      //delay(1000);
       }
-    //Serial.println(memAddressCh);
-    //memAddressCh[-1] = NULL;
-    //dataToPC(memAddressCh);
+
     memReceived = true;
     memAddress = atoi(memAddressCh);
-    
-//    char buff2[50];
-//    sprintf(buff2, "memAddress = %d", memAddress);
-//    dataToPC(buff2);
-    //dataToPC(memAddressCh);
-
     }
   else {
     memReceived = false;
- 
     }
 }
 
@@ -352,25 +305,15 @@ void sendHouseKeep(char result[]){
   dataToPC(houseKeep3);
  
   dataToPC(result);
+
   receiving = true;
-  //wdt_reset();
-  //sendHouseKeepCheck = false;
   }
 
 void pingFromPC(char arr[]){
-  if ((arr[0] == 107) && (arr[1] == 105) && (arr[2] == 99) && (arr[3] == 107)){
-    
-    //wdt_reset();
+  if ((arr[0] == 'k') && (arr[1] == 'i') && (arr[2] == 'c') && (arr[3] == 'k')){
+    wdt_reset();
     }
   }
 
-//void bin2dec(int arr[]){
-//  int arraySize = sizeof(arr)/sizeof(int);
-//  word dec = 0;
-//  for (i = 0; i<arraySize; i ++) {
-//    
-//    }
-//    
-//}
 
 
