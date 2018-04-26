@@ -375,6 +375,8 @@ while n < numLoops:
         if dataRecvd[1] == '\xfe\x02Arduino Reset\xff':
             time.sleep(0.1)
             reboots += 1
+            varlist = ["\xfe\x02"+str(pie)+"\xff",name1,name2,name3,name4, name5]
+
             
             
     if n > 0: 
