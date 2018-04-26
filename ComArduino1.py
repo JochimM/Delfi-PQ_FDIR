@@ -296,7 +296,7 @@ import numpy as np
 
 # NOTE the user must ensure that the next line refers to the correct comm port
 
-ser = serial.Serial("/dev/ttyACM1", 20000)
+ser = serial.Serial("COM3", 20000)
 
 
 startMarker = 254
