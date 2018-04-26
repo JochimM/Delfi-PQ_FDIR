@@ -5,13 +5,13 @@ Fault Detection, Isolation and Recovery (FDIR) is a vital part of satellite syst
 
 During the process of this project, some design choices were made and are listed below:
 
-- The protocol was kept as simple as possible, as this was the first experience with data error analysis using a microcontroller. Therefore, it was decided to send the data with a fixed structure. The data consists of a startmarker (character 254) indicating the beginning of the message followed by the number of bytes in the message (count byte), and an endmarker (character 255) at the very end indicating the end of the message. Furthermore the special byte (character 253) was used in case the begin or end marker was used in the real message of the data sent.
+- The protocol was kept as simple as possible, as this was the first experience with data error analysis using a microcontroller. Therefore, it was decided to send the data with a fixed structure. The data consists of a startmarker (character 254) indicating the beginning of the message followed by the number of bytes in the message (count byte), and an endmarker (character 255) at the very end indicating the end of the message. Furthermore the special byte (character 253) was used in case the begin or end marker was used in the real message of the data sent. A message is defined to be at most 16 bytes long, including the protocol characters. This means that at most 13 bytes are available for sending data. This can easily be changed in the Arduino code by changing maxMessage to a higher value.
 
 - Again for the sake of simplicity, it was decided to only work with characters as the type of the data.
 
 - To access the memory, it was decided to only access part of the SRAM. For the scope of this project, this was sufficient. To access other parts of the memory, more experience would be required with assembler.
 
-- Due to time constraints, flipping of a bit is done in a random fashion in the Arduino script. In a later stage, it would be adviced to choose the location of the bit to be flipped, in order to investigate what location of a bit flip causes more problems. 
+- Due to time constraints, flipping of a bit is done in a random fashion in the byte location that gets sent to the Arduino script. In a later stage, it would be adviced to choose the location of the bit to be flipped, in order to investigate more precisely what location of a bit flip causes more problems. 
 
 
 ## Repository overview
@@ -60,17 +60,18 @@ Literature exists on modelling the SEU rates for a given piece of hardware at a 
 
 ### How can we access the memory on the Arduino?
 
-The memory on the Arduino can be accessed randomly.
+The memory on the Arduino can be accessed randomly. The memory access is done using pointers. The pointers are randomly generated on python as strings, then sent to arduino as characters, converted to ints and then accessed in arduino.
 
 ### What parts of the memory should we inject errors into?
 
 Only into the SRAM, not into the part where the bootloader is stored, otherwise serial communication is not possible anymore and the Arduino will no longer be able to reboot until we flash the bootloader again. 
+The specific locations this code targets are in the interval [257, 2303].
 
 There will also have to be some code on the Arduino which has to inject the errors into the memory at the memory locations it receives through serial. This code should also not be injected with errors. 
 
 ### How will we determine whether an error has occurred? 
 
-This will be done by analysing the housekeeping messages through the Python script.
+This is done by analysing the housekeeping messages through the Python script.
 
 ### What is an error?
 
@@ -81,6 +82,7 @@ Any malfunctioning of the flight software.
 - Bad outputs
 - Watchdog resets (the watchdog doesn't get kicked)
 - Fatal errors (the Arduino stops working and resets)
+- Errors in the communication protocol
 
 ### Will there be gradations in errors?
 
@@ -88,11 +90,11 @@ Fatal errors are worse than a watchdog reset, which is again worse than wrong ou
 
 ### How do we interface with the error simulation to know what part of the memory caused the error?
 
-The time and memory address of all error injections will be stored and will be used for the interface with the error analysis software.
+The memory address of all error injections will be stored and will be used for the interface with the error analysis software.
 
 ### How do we want to visualize the critical memory locations?
 
-On a memory map (rectangular) with three different colors for three gradations in errors.
+On a memory map (rectangular) with red indicating an error occurred due to a bitflip at that location.
 
 ## Structure of software and hardware interface
 For the purpose of testing the FDIR testing software, an Arduino Uno board serves as hardware, representing the OBC of a CubeSat. Furthermore, a serial connection provides the communication with the PC to read out the performance of the software,  written in Python.
@@ -250,7 +252,7 @@ The verification of the check for the memory address can be found in checkMemAdd
 
 which is according to the actual representation used in the main software. MA stands for memory address and the four following numbers represent the memory location. 'x' is used as terminator.
 
-This checkIfMemAddress function is checking if a memory message is received and is giving the memory location as output. With the above input, the expected result is '0276' as the memory location.
+This checkIfMemAddress function is checking if a memory message is received and is giving the memory location as output. With the above input, the expected result is '276' as the memory location.
 
 The output when running this unit test is:
 
@@ -266,7 +268,7 @@ Issues arose when trying to use the pointer with varying formats of the memory l
 
 - Communication over Serial
 
-The communication over serial was in times troublesome due to the way data has to be send over from Python to Arduino and vice versa. When viewing both scripts it can be seen that before data can be send a specific function is used to encode the data in the proper format, for example adding start and end markers to the string that is sent. Next to that, before the data can be read, it needs to be decoded again. It has taken some time to get used to the way data has to be sent and can be read afterwards in each respective programme.
+The communication over serial was in times troublesome due to the way data has to be send over from Python to Arduino and vice versa. When viewing both scripts it can be seen that before data can be send a specific function is used to encode the data in the proper format, for example adding start and end markers to the string that is sent. Next to that, before the data can be read, it needs to be decoded again. It has taken some time to get used to the way data has to be sent and can be read afterwards in each respective programme. Alot of the problems that occurred were due to the fact that the program was first setup to read the incoming messages byte by byte. It would read one byte, then perform the rest of the main arduino loop, then read the next byte, etc. Once a complete message was received it would perform the bitflip. This made it impossible to know where errors came from and was changed to read the message in its entirety before executing the rest of the main loop.
 
 - Types of variables
 
@@ -285,3 +287,5 @@ After working on this project some recommendations for future work can be made a
 - Implementation of a SEU simulator. Right now the errors are generated at random. However, a more realistic SEU simulator would also model different types of radiation. If for example part of the memory would be affected, this could results in more severe damage.
 
 - Analysing different data types, as for now only characters are used as data. 
+
+- Implement the pingFromPC function. This would reset the watchdog timer on the arduino only if the python programme sends a specific 'kick' message. This can be used to reset the board from the python programme out. 
