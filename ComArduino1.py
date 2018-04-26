@@ -229,7 +229,7 @@ def waitForArduino():
 
 def randAddress():
     
-    location = random.randint(257,1500) #2303
+    location = random.randint(257,2303) #2303
     if location < 1000:
         location = "0"+ str(location)
         
