@@ -201,13 +201,13 @@ Below it can be found how the project can be build and used.
 
 ## Results
 
-The results of the bit flips in various memory locations (have a nice plot).
+The results of the program that was run can be seen in the figure below. The locations of the bit flips that did not cause an error have not been plotted since this was shown to be uniformly distributed over the memory map. In total 101 bit flips caused errors (yellow dots) of which 10 were hard errors (red dots) which caused the Arduino to crash. These errors occured during the process of inserting around 2000 randomly located bit flips to the Arduino's RAM memory. 
 
 ![img](https://i.imgur.com/nnuJHEN.png)
 
-![img](https://i.imgur.com/htH8T1s.png)
+After having the results for the bit flips in various memory locations, limited time was used to investigate the reason why the microcontroller is crashing or stops working. One of the reasons why this happens is found to be a change in local variables. Since one of these local variables is changing, the script does not know how to react, which results in a crash. This can be seen in the figure below, where the final item can be observed to contain a second thorn in the string. This phenomenon was observed in all hard errors. Since this character is also the start marker it is assumed the effect of having two start markers in the string causes the program to crash.
 
-After having the results for the bit flips in various memory locations, limited time was used to investigate the reason why the microcontroller is crashing or stops working. One of the reasons why this happens is found to be a change in local variables. Since one of these local variables is changing, the script does not know how to react, which results in a crash. 
+![img](https://i.imgur.com/htH8T1s.png)
 
 ## Unit tests
 
