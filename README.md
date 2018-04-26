@@ -27,6 +27,8 @@ Besides, this repository consists of three verification Arduino files:
 - simplebitflip.ino: This file verifies the bit flip is working. This file changes the bit for a specified value (e.g. 1000) on a specified location (e.g. bit n° 4) and gives the new value.
 - checkMemAddr.ino: This file verifies the function to check the memory address and can be found in the checkMemAddr folder.
 
+There is also a python file 'plotter.py' to plot the errors on a memory map.
+
 Furthermore, note there is a trash folder for the user to see what was done, but was found to be unsuccessful. However, there is no documentation on this trash folder.
 
 ## Literature study
@@ -205,7 +207,9 @@ The results of the program that was run can be seen in the figure below. The loc
 
 ![img](https://i.imgur.com/nnuJHEN.png)
 
-After having the results for the bit flips in various memory locations, limited time was used to investigate the reason why the microcontroller is crashing or stops working. One of the reasons why this happens is found to be a change in local variables. Since one of these local variables is changing, the script does not know how to react, which results in a crash. This can be seen in the figure below, where the final item can be observed to contain a second thorn in the string. This phenomenon was observed in all hard errors. Since this character is also the start marker it is assumed the effect of having two start markers in the string causes the program to crash.
+From this figure, no clear conclusion can be drawn in terms of what memory locations are most affected by the bit flips. It would be recommended to perform more iterations to investigate the most sensitive memory locations.
+
+After having the results for the bit flips in various memory locations, limited time was used to investigate the reason why the microcontroller is crashing or stops working. One of the reasons why this happens is found to be a change in local variables. Since one of these local variables is changing, the script does not know how to react, which results in a crash. This can be seen in the figure below, where the final item can be observed to contain a second 'thorn' þ in the string. This phenomenon was observed in all hard errors. Since this character is also the start marker it is assumed the effect of having two start markers in the string causes the program to crash.
 
 ![img](https://i.imgur.com/htH8T1s.png)
 
@@ -297,3 +301,5 @@ After working on this project some recommendations for future work can be made a
 - Analysing different data types, as for now only characters are used as data. 
 
 - Implement the pingFromPC function. This would reset the watchdog timer on the Arduino only if the Python programme sends a specific 'kick' message. This can be used to reset the board from the python programme. 
+
+- Perform more iterations in order to investigate the most sensitive memory locations in the RAM memory.
