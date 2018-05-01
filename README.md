@@ -162,7 +162,7 @@ The first action that is done in this loop is creating a random memory address (
 
 ![img](https://i.imgur.com/Q8RK7FS.png)
 
-This number is then send to the Arduino using the sendToArduino function (5), which adds the start and end marker to this number and converts the random location string to the proper format (Bytes) using the encodeHighBytes function. The program now waits for a reply from the Arduino. When a reply has been sent, the script decodes the message by using the opposite function of the sendToArduino function, which is the recvFromArduino (6) function. To finally check whether the bitflip has caused an error in the Arduino RAM memory the content of the received message is checked using the errorcheck (7) function. In this function the housekeeping data that is saved on the Arduino's RAM memory is checked for correctness. When an error has been found the bitflip's memory location is stored using the analyse (8) function. After 'numLoops' have passed, the serial connection is closed. 
+This number is then sent to the Arduino using the sendToArduino function (5), which adds the start and end marker to this number and converts the random location string to the proper format (Bytes) using the encodeHighBytes function. The program now waits for a reply from the Arduino. When a reply has been sent, the script decodes the message by using the opposite function of the sendToArduino function, which is the recvFromArduino (6) function. To finally check whether the bitflip has caused an error in the Arduino RAM memory the content of the received message is checked using the errorcheck (7) function. In this function the housekeeping data that is saved on the Arduino's RAM memory is checked for correctness. When an error has been found the bitflip's memory location is stored using the analyse (8) function. After 'numLoops' have passed, the serial connection is closed. 
 
 
 ## Flight Software
@@ -215,8 +215,7 @@ From this figure, no clear conclusion can be drawn in terms of what memory locat
 
 After having the results for the bit flips in various memory locations, limited time was used to investigate the reason why the microcontroller is crashing or stops working. One of the reasons why this happens is found to be a change in local variables. Since one of these local variables is changing, the script does not know how to react, which results in a crash. This can be seen in the figure below, where the final item can be observed to contain a second 'thorn' þ in the string. This phenomenon was observed in all hard errors. Since this character is also the start marker it is assumed the effect of having two start markers in the string causes the program to crash.
 
-![img](https://i.imgur.com/htH8T1s.png)
-
+![img](https://i.imgur.com/9rrrtAU.png)
 The results from a limited run (+- 10000 iterations) can be found in the Errors.csv file, where the first column contains locations causing soft errors (errors in the housekeeping data) and the second column contains locations causing hard errors (reboot loops).
 
 ## Unit tests
@@ -282,7 +281,7 @@ Issues arose when trying to use the pointer with varying formats of the memory l
 
 - Communication over Serial
 
-The communication over serial was in times troublesome due to the way data has to be send over from Python to Arduino and vice versa. When viewing both scripts it can be seen that before data can be send a specific function is used to encode the data in the proper format, for example adding start and end markers to the string that is sent. Next to that, before the data can be read, it needs to be decoded again. It has taken some time to get used to the way data has to be sent and can be read afterwards in each respective programme. Alot of the problems that occurred were due to the fact that the program was first setup to read the incoming messages byte by byte. It would read one byte, then perform the rest of the main arduino loop, then read the next byte, etc. Once a complete message was received it would perform the bitflip. This made it impossible to know where errors came from and was changed to read the message in its entirety before executing the rest of the main loop.
+The communication over serial was in times troublesome due to the way data has to be sent over from Python to Arduino and vice versa. When viewing both scripts it can be seen that before data can be sent a specific function is used to encode the data in the proper format, for example adding start and end markers to the string that is sent. Next to that, before the data can be read, it needs to be decoded again. It has taken some time to get used to the way data has to be sent and can be read afterwards in each respective programme. Alot of the problems that occurred were due to the fact that the program was first setup to read the incoming messages byte by byte. It would read one byte, then perform the rest of the main arduino loop, then read the next byte, etc. Once a complete message was received it would perform the bitflip. This made it impossible to know where errors came from and was changed to read the message in its entirety before executing the rest of the main loop.
 
 - Types of variables
 
