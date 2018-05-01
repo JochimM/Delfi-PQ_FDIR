@@ -217,6 +217,8 @@ After having the results for the bit flips in various memory locations, limited 
 
 ![img](https://i.imgur.com/htH8T1s.png)
 
+The results from a limited run (+- 10000 iterations) can be found in the Errors.csv file, where the first column contains locations causing soft errors (errors in the housekeeping data) and the second column contains locations causing hard errors (reboot loops).
+
 ## Unit tests
 
 ### Bit flip
