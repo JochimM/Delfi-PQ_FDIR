@@ -215,7 +215,7 @@ From this figure, no clear conclusion can be drawn in terms of what memory locat
 
 After having the results for the bit flips in various memory locations, limited time was used to investigate the reason why the microcontroller is crashing or stops working. One of the reasons why this happens is found to be a change in local variables. Since one of these local variables is changing, the script does not know how to react, which results in a crash. This can be seen in the figure below, where the final item can be observed to contain a second 'thorn' þ in the string. This phenomenon was observed in all hard errors. Since this character is also the start marker it is assumed the effect of having two start markers in the string causes the program to crash.
 
-![img](https://i.imgur.com/9rrrtAU.png)
+![img](https://i.imgur.com/cuOYkXZ.png)
 The results from a limited run (+- 10000 iterations) can be found in the Errors.csv file, where the first column contains locations causing soft errors (errors in the housekeeping data) and the second column contains locations causing hard errors (reboot loops).
 
 ## Unit tests
